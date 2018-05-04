@@ -1,0 +1,383 @@
+* {
+ box-sizing: border-box;
+ margin: 0;
+ padding: 0;
+}
+
+html {
+  font-family: 'Trebuchet MS';
+  font-weight: bold;
+}
+
+body {
+  color: white;
+  background: darkorange;
+}
+
+button {
+  color: white;
+  background: orange;
+  border: none;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 20px;
+  padding: 16px;
+  margin: 8px;
+  height: auto;
+  width: 20%;
+}
+button:hover {
+  color: black;
+  background: yellow;
+}
+button:focus {
+  color: black;
+  background: yellow;
+}
+
+h1 {
+  text-align: center;
+}
+h2 {
+  text-align: center;
+}
+h3 {
+  text-align: center;
+}
+h4 {
+  text-align: center;
+}
+
+img {
+  max-height: 30%;
+  max-width: 30%;
+  border-radius: 4px;
+	height: auto;
+	width: auto;
+  align-self: center;
+}
+
+input {
+  background-color: orange;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 16px;
+  margin-bottom: 8px;
+  margin-left: 1%;
+  margin-right: 1%;
+  width: 98%;
+}
+input:hover {
+  background-color: yellow;
+}
+input:focus {
+  background-color: yellow;
+}
+
+li {
+  color: white;
+  background-color: orange;
+  border-radius: 4px;
+  margin: 4px 0;
+  font-size: 20px;
+  padding: 4px;
+  text-align: left;
+}
+li:hover {
+  color: black;
+  background: yellow;
+}
+li:focus {
+  color: black;
+  background: yellow;
+}
+
+p {
+  text-align: left;
+  font-size: 20px;
+  margin: 1%;
+}
+
+table {
+	margin: 1%;
+  width: 98%;
+}
+table input {
+  border: none;
+  margin: 0;
+  width: 100%;
+}
+
+td {
+  border-radius: 2px;
+  padding: 16px;
+  text-align: center;
+}
+
+textarea {
+  background-color: orange;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 16px;
+  margin-bottom: 8px;
+  margin-left: 1%;
+  margin-right: 1%;
+  width: 98%;
+}
+
+th {
+  border-radius: 2px;
+  padding: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+tr {
+  border-radius: 2px;
+  padding: 16px;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+  margin: 8px;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.canvas {
+  position: absolute;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 0.9;
+  position: relative;
+  align-items: center;
+  animation: fadeEffect 1s;
+  -webkit-animation: fadeEffect 1s;
+}
+.content-detail {
+  display: flex;
+  position: relative;
+  flex: 0.9;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.content-control {
+  display: flex;
+  flex: 0.1;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  background: linear-gradient(tomato, darkorange);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  flex: 0.1;
+}
+#header-title {
+  font-size: 32px;
+  text-align: center;
+  margin: 0;
+}
+#toast {
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+}
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  color: white;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+.loader {
+
+}
+.loader #spinner {
+  stroke: white;
+  stroke-width: 3px;
+  -webkit-transform-origin: 50%;
+  transform-origin: 50%;
+  -webkit-animation: line 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, rotate 1.6s linear infinite;
+  animation: line 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, rotate 1.6s linear infinite;
+}
+
+.calendar {
+  background-color: orange;
+}
+.calendar-head {
+  cursor:default;
+  font-weight:bold;
+  vertical-align: middle;
+}
+#label {
+  padding: 16px;
+  width: 66%;
+  display: inline-block;
+  text-align: center;
+}
+#prev {
+  display: inline-block;
+  width: 16%;
+  padding: 16px;
+  text-align: center;
+}
+#next {
+  display: inline-block;
+  width: 16%;
+  padding: 16px;
+  text-align: center;
+}
+.calendar .calendar-head .button:hover {
+
+}
+.calendar table {
+  border-collapse:collapse;
+}
+.calendar td {
+  color: white;
+  text-align:center;
+  border:1px solid white;
+  cursor:default;
+}
+.calendar-days {
+  table-layout: fixed;
+}
+.calendar-days td {
+
+}
+.calendar-days td:not(:last-child) {
+  border-right:1px solid white;
+}
+.calendar .calendar-body td.today {
+  color: black;
+  background: white;
+}
+.calendar .calendar-body td:not(.nil):hover {
+  background: darkorange;
+}
+.calendar .calendar-body td span {
+
+}
+.calendar .calendar-body td span:first-child {
+
+}
+.calendar .calendar-body td span:last-child {
+
+}
+.calendar .calendar-body table.curr {
+
+}
+.calendar .calendar-body table.temp {
+
+}
+
+@keyframes slide-in {
+  from {
+    -webkit-transform: translateX(100%);
+  }
+  to {
+    -webkit-transform: translateX(0%);
+  }
+}
+
+@-webkit-keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    -webkit-transform: translateX(-100%);
+  }
+  to {
+    -webkit-transform: translateX(0%);
+  }
+}
+
+@-webkit-keyframes slide-out {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+  to {
+    -webkit-transform: rotate(450deg);
+    transform: rotate(450deg);
+  }
+}
+
+@keyframes rotate {
+  from {
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+  }
+  to {
+    -webkit-transform: rotate(450deg);
+    transform: rotate(450deg);
+  }
+}
+
+@-webkit-keyframes fadeEffect {
+	from {
+		opacity				: 0;
+	} to {
+		opacity				: 1;
+	}
+}
+
+@keyframes fadeEffect {
+	from {
+		opacity				: 0;
+	} to {
+		opacity				: 1;
+	}
+}

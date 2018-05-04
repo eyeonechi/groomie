@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html
+  lang='en'
+  xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Groomie</title>
+    <meta
+      http-equiv='Content-Type'
+      content='text/html'
+      charset='UTF-8'/>
+    <meta
+      name='viewport'
+      content='width=device-width, initial-scale=1.0'/>
+    <link
+      rel='stylesheet'
+      href='index.css'/>
+    <script
+      src='/socket.io/socket.io.js'></script>
+    <script
+      src='jquery.min.js'></script>
+    <script
+      src='index.js'></script>
+  </head>
+  <body>
+    <!-- Canvas -->
+    <div class='canvas'>
+
+      <!-- Header -->
+      <div id='header' class='header'>
+        <p id='header-title'></p>
+        <p id='toast'></p>
+      </div>
+
+      <!-- Home Fragment -->
+      <div id='home' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <img id='home-image' src='images/logo.png' alt='logo'/><br>
+            <h1>Groomie</h1>
+            <h4>Team Orange</h4><br>
+            <p>username</p>
+            <input id='home-username' type='text'/><br>
+            <p>password</p>
+            <input id='home-password' type='password'/><br>
+          </div>
+          <div class='content-control'>
+            <button id='home-button-login'>login</button>
+            <button id='home-button-register'>register</button>
+            <button id='home-button-about'>about</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Fragment -->
+      <div id='register' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>username</p>
+            <input id='register-username' type='text'/><br><br>
+            <p>name</p>
+            <input id='register-name' type='text'/><br><br>
+            <p>password</p>
+            <input id='register-password' type='password'/><br><br>
+          </div>
+          <div class='content-control'>
+            <button id='register-button-register'>register</button>
+            <button id='register-button-back'>back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Fragment -->
+      <div id='dashboard' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <img id='dashboard-image' src='images/edison.jpg' alt='profile-picture'/><br>
+            <h2>welcome, big thigh</h2>
+            <p>my appointments</p><br>
+            <ul id='dashboard-appointments'>
+              <li>test appointment 1</li>
+              <li>test appointment 2</li>
+              <li>test appointment 3</li>
+            </ul><br>
+            <p>my dogs</p><br>
+            <ul id='dashboard-dogs'>
+              <li>larrie</li>
+              <li>iwant</li>
+              <li>youthing</li>
+            </ul>
+            <button id='test'>appointment</button>
+            <button id='test1'>dog</button>
+          </div>
+          <div class='content-control'>
+            <button id='dashboard-button-logout'>logout</button>
+            <button id='dashboard-button-create'>create</button>
+            <button id='dashboard-button-profile'>profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Create Fragment -->
+      <div id='appointment-create' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <h2>select date</h2><br><br>
+            <div class='calendar'>
+              <div class='calendar-head'>
+                <span id='prev'>&lang;</span>
+                <span id='label'>June 2010</span>
+                <span id='next'>&rang;</span>
+              </div>
+              <div class='calendar-body'>
+                <table class='calendar-days'>
+                  <tr>
+                    <th>sun</th><th>mon</th><th>tue</th><th>wed</th><th>thu</th><th>fri</th><th>sat</th>
+                  </tr>
+                  <tbody>
+                    <tr><td class="nil"></td><td class="nil"></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+                    <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td class="today">11</td><td>12</td></tr>
+                    <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+                    <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
+                    <tr><td>27</td><td>28</td><td>29</td><td>30</td><td class="nil"></td><td class="nil"></td><td class="nil"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class='content-control'>
+            <button id='appointment-create-button-back'>back</button>
+            <button id='appointment-create-button-next'>next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Create 2 Fragment -->
+      <div id='appointment-create-2' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <h2>date dd/mm/yyyy</h2>
+            <h2>select time</h2><br><br>
+            <ul id='appointment-create-2-times'>
+              <li>xx:xx - yy:yy</li>
+              <li>yy:yy - zz:zz</li>
+            </ul>
+            <h2>select dog</h2><br><br>
+            <ul id='appointment-create-2-dogs'>
+              <li>larrie</li>
+              <li>iwant</li>
+              <li>youthing</li>
+            </ul>
+            <h2>select grooming option</h2><br><br>
+            <ul id='appointment-create-2-dogs'>
+              <li>wash only</li>
+              <li>wash and nail clipping</li>
+              <li>deluxe grooming</li>
+            </ul>
+            <h2>enter description</h2><br><br>
+            <textarea id='appointment-create-2-description'></textarea>
+          </div>
+          <div class='content-control'>
+            <button id='appointment-create-2-button-back'>back</button>
+            <button id='appointment-create-2-button-create'>create</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointment Detail Fragment -->
+      <div id='appointment-detail' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>date</p>
+            <p>time</p>
+            <p>dog</p>
+            <p>groomer</p>
+            <p>description</p>
+          </div>
+          <div class='content-control'>
+            <button id='appointment-detail-button-back'>back</button>
+            <button id='appointment-detail-button-cancel'>cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dog Detail Fragment -->
+      <div id='dog-detail' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>name</p>
+            <p>age</p>
+            <p>breed</p>
+          </div>
+          <div class='content-control'>
+            <button id='dog-detail-button-back'>back</button>
+            <button id='dog-detail-button-delete'>delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Fragment -->
+      <div id='about' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <h2>Version: 1.0</h2><br>
+            <h2>SWEN90016 Software Processes and Management</h2><br>
+            <h2>Team Orange</h2>
+            <table>
+              <tr>
+                <td>Ivan Ken Weng Chee</td>
+                <td>736901</td>
+                <td>ichee@student.unimelb.edu.au</td>
+              </tr>
+              <tr>
+                <td>Ruifeng Luo</td>
+                <td>686141</td>
+                <td>ruifengl@student.unimelb.edu.au</td>
+              </tr>
+              <tr>
+                <td>Wuang Shen</td>
+                <td>716090</td>
+                <td>wuangs@student.unimelb.edu.au</td>
+              </tr>
+              <tr>
+                <td>Yu Ting Lin</td>
+                <td>762826</td>
+                <td>ylin8@student.unimelb.edu.au</td>
+              </tr>
+            </table><br>
+          </div>
+          <div class='content-control'>
+            <button id='about-button-back'>back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Fragment -->
+      <div id='loader' class='content loader'>
+        <svg viewBox='0 0 32 32' width='32' height='32'>
+          <circle id='spinner' cx='16' cy='16' r='14' fill='none'></circle>
+        </svg>
+      </div>
+
+    </div>
+  </body>
+</html>
