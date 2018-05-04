@@ -1,0 +1,25 @@
+{
+  "name": "groomie",
+  "version": "1.0.0",
+  "description": "Dog grooming appointment scheduler",
+  "main": "server.js",
+  "author": "Team Orange",
+  "license": "MIT",
+  "keywords": [
+    "dog",
+    "grooming",
+    "appointment"
+  ],
+  "engines": {
+    "node": "4.2.6"
+  },
+  "repository": {
+  },
+  "dependencies": {
+    "express": "4.16.2",
+    "http": "0.0.0",
+    "jquery": "^3.3.1",
+    "mysql": "^2.15.0",
+    "socket.io": "^2.0.4"
+  }
+}
