@@ -18,8 +18,16 @@ Google Drive:
 https://drive.google.com/open?id=188ND1b82q17ZNzJeBNZyYnXszCEmVbk1
 
 Trello:
-https://trello.com/invite/b/OobR87Oh/80c28ebf1750c22cf61fa03d2a72f152/team-orange
+https://trello.com/b/MOYBhqT9/swen900016
 
 ## Instructions
+Auto:
 make install
 make run
+
+Manual:
+cd src/server
+npm install
+sudo service mysql start
+node server.js
+open localhost:3000 in browser
