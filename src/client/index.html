@@ -73,22 +73,14 @@
       <div id='dashboard' class='content'>
         <div class='canvas'>
           <div class='content-detail'>
-            <img id='dashboard-image' src='images/edison.jpg' alt='profile-picture'/><br>
-            <h2>welcome, big thigh</h2>
+            <img id='dashboard-image' src='images/user.png' alt='profile-picture'/><br>
+            <h2>welcome, user</h2>
             <p>my appointments</p><br>
-            <ul id='dashboard-appointments'>
-              <li>test appointment 1</li>
-              <li>test appointment 2</li>
-              <li>test appointment 3</li>
-            </ul><br>
+            <ul id='dashboard-appointments'></ul><br>
+
             <p>my dogs</p><br>
-            <ul id='dashboard-dogs'>
-              <li>larrie</li>
-              <li>iwant</li>
-              <li>youthing</li>
-            </ul>
-            <button id='test'>appointment</button>
-            <button id='test1'>dog</button>
+            <ul id='dashboard-dogs'></ul>
+
           </div>
           <div class='content-control'>
             <button id='dashboard-button-logout'>logout</button>
@@ -106,7 +98,7 @@
             <div class='calendar'>
               <div class='calendar-head'>
                 <span id='prev'>&lang;</span>
-                <span id='label'>June 2010</span>
+                <span id='label'>June 2018</span>
                 <span id='next'>&rang;</span>
               </div>
               <div class='calendar-body'>
@@ -115,11 +107,11 @@
                     <th>sun</th><th>mon</th><th>tue</th><th>wed</th><th>thu</th><th>fri</th><th>sat</th>
                   </tr>
                   <tbody>
-                    <tr><td class="nil"></td><td class="nil"></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
-                    <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td class="today">11</td><td>12</td></tr>
-                    <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
-                    <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
-                    <tr><td>27</td><td>28</td><td>29</td><td>30</td><td class="nil"></td><td class="nil"></td><td class="nil"></td></tr>
+                    <tr><td class="nil"></td><td>1</td><td>2</td><td>3</td><td>4</td><td class="today">5</td><td>6</td></tr>
+                    <tr><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+                    <tr><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
+                    <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td></tr>
+                    <tr><td>28</td><td>29</td><td>30</td><td class="nil"></td><td class="nil"></td><td class="nil"></td><td class="nil"></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -136,26 +128,22 @@
       <div id='appointment-create-2' class='content'>
         <div class='canvas'>
           <div class='content-detail'>
-            <h2>date dd/mm/yyyy</h2>
-            <h2>select time</h2><br><br>
-            <ul id='appointment-create-2-times'>
-              <li>xx:xx - yy:yy</li>
-              <li>yy:yy - zz:zz</li>
-            </ul>
-            <h2>select dog</h2><br><br>
-            <ul id='appointment-create-2-dogs'>
-              <li>larrie</li>
-              <li>iwant</li>
-              <li>youthing</li>
-            </ul>
-            <h2>select grooming option</h2><br><br>
-            <ul id='appointment-create-2-dogs'>
-              <li>wash only</li>
-              <li>wash and nail clipping</li>
-              <li>deluxe grooming</li>
-            </ul>
-            <h2>enter description</h2><br><br>
-            <textarea id='appointment-create-2-description'></textarea>
+            <h2>date dd/mm/yyyy</h2><br>
+
+            <h2>select time</h2><br>
+            <select id='appointment-create-2-times'></select>
+
+            <h2>select dog</h2><br>
+            <select id='appointment-create-2-dogs'></select>
+
+            <h2>select grooming option</h2><br>
+            <select id='appointment-create-2-options'></select>
+
+            <h2>enter address</h2><br>
+            <textarea id='appointment-create-2-address'></textarea>
+
+            <h2>enter instructions</h2><br>
+            <textarea id='appointment-create-2-instructions'></textarea>
           </div>
           <div class='content-control'>
             <button id='appointment-create-2-button-back'>back</button>
@@ -169,10 +157,17 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>date</p>
+            <input id='appointment-detail-date' type='date'/>
             <p>time</p>
+            <input id='appointment-detail-time' type='text'/>
             <p>dog</p>
+            <input id='appointment-detail-dog' type='text'/>
             <p>groomer</p>
-            <p>description</p>
+            <input id='appointment-detail-groomer' type='text'/>
+            <p>option</p>
+            <input id='appointment-detail-option' type='text'/>
+            <p>instructions</p>
+            <input id='appointment-detail-instructions' type='text'/>
           </div>
           <div class='content-control'>
             <button id='appointment-detail-button-back'>back</button>
@@ -186,8 +181,11 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>name</p>
+            <input id='dog-detail-name' type='text'/>
             <p>age</p>
+            <input id='dog-detail-age' type='text'/>
             <p>breed</p>
+            <input id='dog-detail-breed' type='text'/>
           </div>
           <div class='content-control'>
             <button id='dog-detail-button-back'>back</button>
