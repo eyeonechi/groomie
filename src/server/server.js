@@ -34,8 +34,11 @@ app.use(express.static(__dirname + '/../client/'));
 
 // Logs database connection errors
 db.connect(function(err) {
-  if (err) throw err;
-  console.log('database connected');
+  if (err) {
+    console.log('failed to connect to database');
+  } else {
+    console.log('database connected');
+  }
 });
 
 io.on('connection', function(socket) {

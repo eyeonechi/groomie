@@ -19,3 +19,7 @@ https://drive.google.com/open?id=188ND1b82q17ZNzJeBNZyYnXszCEmVbk1
 
 Trello:
 https://trello.com/invite/b/OobR87Oh/80c28ebf1750c22cf61fa03d2a72f152/team-orange
+
+## Instructions
+make install
+make run

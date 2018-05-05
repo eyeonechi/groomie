@@ -1,21 +1,23 @@
-JAVAHOME=/usr/java1.6/bin
-JAVAC=$(JAVAHOME)/javac
-JAVA=$(JAVAHOME)/java
-DRIVER=Driver
-TESTDIR=test
-TEST=$(TESTDIR)/Driver.java
-SRCDIR=src
-SRC=$(SRCDIR)/Graph.java
-CLASSES=classes/
+# SWEN90016 Software Processes and Management
+# Semester 1 2018
+# Assignment 2 - Groomie
+# Makefile
+# Team Orange
 
-compile: $(CLASSES)
-	$(JAVAC) -d classes/ $(SRC) $(TEST)
+EXECUTABLE=src/server/server.js
+EXECUTOR?=node
+INSTALLER?=npm
 
-test: compile
-	$(JAVA) -ea -classpath $(CLASSES) $(DRIVER)
+all:
+	${INSTALLER} install
+	sudo service mysql start
+	${EXECUTOR} ${EXECUTABLE}
 
-$(CLASSES):
-	mkdir classes
+install:
+	${INSTALLER} install
 
-clean:
-	rm -rf $(CLASSES)
+start:
+	sudo service mysql start
+
+run:
+	${EXECUTOR} ${EXECUTABLE}
