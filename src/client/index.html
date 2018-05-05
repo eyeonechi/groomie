@@ -1,3 +1,10 @@
+<!--
+  SWEN90016 Software Processes and Management
+  Semester 1 2018
+  Assignment 2 - Groomie
+  Team Orange
+  index.html
+-->
 <!DOCTYPE html>
 <html
   lang='en'
@@ -84,7 +91,8 @@
           </div>
           <div class='content-control'>
             <button id='dashboard-button-logout'>logout</button>
-            <button id='dashboard-button-create'>create</button>
+            <button id='dashboard-button-create'>+ appointment</button>
+            <button id='dashboard-button-create-dog'>+ dog</button>
             <button id='dashboard-button-profile'>profile</button>
           </div>
         </div>
@@ -171,7 +179,25 @@
           </div>
           <div class='content-control'>
             <button id='appointment-detail-button-back'>back</button>
-            <button id='appointment-detail-button-cancel'>cancel</button>
+            <button id='appointment-detail-button-cancel'>- appointment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dog Create Fragment -->
+      <div id='dog-create' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>name</p>
+            <input id='dog-create-name' type='text'/>
+            <p>age</p>
+            <input id='dog-create-age' type='text'/>
+            <p>breed</p>
+            <input id='dog-create-breed' type='text'/>
+          </div>
+          <div class='content-control'>
+            <button id='dog-create-button-back'>back</button>
+            <button id='dog-create-button-create'>create</button>
           </div>
         </div>
       </div>
@@ -189,7 +215,7 @@
           </div>
           <div class='content-control'>
             <button id='dog-detail-button-back'>back</button>
-            <button id='dog-detail-button-delete'>delete</button>
+            <button id='dog-detail-button-delete'>- dog</button>
           </div>
         </div>
       </div>
@@ -202,6 +228,11 @@
             <h2>SWEN90016 Software Processes and Management</h2><br>
             <h2>Team Orange</h2>
             <table>
+              <tr>
+                <th>name</th>
+                <th>student id</th>
+                <th>student email</th>
+              </tr>
               <tr>
                 <td>Ivan Ken Weng Chee</td>
                 <td>736901</td>

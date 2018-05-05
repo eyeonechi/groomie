@@ -1,3 +1,11 @@
+/*
+ * SWEN90016 Software Processes and Management
+ * Semester 1 2018
+ * Assignment 2 - Groomie
+ * server.js
+ * Team Orange
+ */
+
 var HOST    = 'localhost';
 var PORT    = 3000;
 
@@ -15,16 +23,16 @@ var db      = mysql.createConnection({
   port     : 3306
 });
 
-/* Listen on specified port */
+// Listen on specified port
 server.listen(PORT, HOST, function() {
   console.log(Date());
   console.log('server running at http://' + HOST + ':' + PORT + '/');
 });
 
-/* Route handler to serve client */
+// Route handler to serve client
 app.use(express.static(__dirname + '/../client/'));
 
-/* Logs database connection errors */
+// Logs database connection errors
 db.connect(function(err) {
   if (err) throw err;
   console.log('database connected');
@@ -66,6 +74,16 @@ io.on('connection', function(socket) {
           appointments
         });
       });
+    });
+  });
+
+  socket.on('dog create', function(data) {
+    console.log(data);
+    var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, (SELECT id FROM groomie.Customer WHERE name=?));';
+    var params = [data.name, data.breed, data.age, data.customer];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('dog create success', res);
     });
   });
 
@@ -145,3 +163,77 @@ io.on('connection', function(socket) {
   });
 
 });
+
+/*
+getAvailableTimes(['10:00', '15:00'], ['11:30', '16:30']);
+getAvailableTimes(['09:00', '11:00', '15:30'], ['10:30', '12:30', '17:00']);
+getAvailableTimes(['14:00', '15:30'], ['15:30', '17:00']);
+getAvailableTimes(['09:30'], ['11:00']);
+
+function getAvailableTimes(time_starts, time_ends) {
+  var intervals = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+
+  var available = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+  var available1 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+  var available2 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+  var available3 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+  for (var i = 0; i < available.length; i ++) {
+    for (var j = 0; j < time_starts.length; j ++) {
+      if (available[i] === time_starts[j]) {
+        available.splice(i, 3);
+      }
+    }
+  }
+  for (var i = 0; i < available1.length; i ++) {
+    for (var j = 0; j < time_starts.length; j ++) {
+      if (available1[i] === time_starts[j]) {
+        available1.splice(i - 2, 2);
+      }
+    }
+  }
+  for (var i = 0; i < available3.length; i ++) {
+    for (var j = 0; j < time_starts.length; j ++) {
+      if (available3[i] === time_starts[j]) {
+        available3.splice(i - 1, 1);
+      }
+    }
+  }
+  for (var i = 0; i < available2.length; i ++) {
+    for (var j = 0; j < time_ends.length; j ++) {
+      if (available2[i] === time_ends[j]) {
+        available2.splice(i - 2, 2);
+      }
+    }
+  }
+
+  var final = []
+  var finalfinal = []
+  var finalfinalfinal = []
+  for (var i = 0; i < available.length; i ++) {
+    for (var j = 0; j < available2.length; j ++) {
+      if (available[i] === available2[j]) {
+        final.push(available[i]);
+      }
+    }
+  }
+  for (var i = 0 ; i < final.length; i ++) {
+    for (var j = 0; j < available1.length; j ++) {
+      if (final[i] === available1[j]) {
+        finalfinal.push(final[i])
+      }
+    }
+  }
+  for (var i = 0 ; i < finalfinal.length; i ++) {
+    for (var j = 0; j < available3.length; j ++) {
+      if (finalfinal[i] === available3[j]) {
+        finalfinalfinal.push(finalfinal[i])
+      }
+    }
+  }
+
+  //console.log(available);
+  //console.log(available2);
+  console.log(finalfinalfinal);
+  console.log();
+}
+*/

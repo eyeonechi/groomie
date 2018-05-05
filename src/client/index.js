@@ -1,3 +1,11 @@
+/*
+ * SWEN90016 Software Processes and Management
+ * Semester 1 2018
+ * Assignment 2 - Groomie
+ * index.js
+ * Team Orange
+ */
+
 'use strict';
 
 $(document).ready(function() {
@@ -20,6 +28,7 @@ $(document).ready(function() {
   /* Dashboard */
   $('#dashboard-button-logout').click({src: 'dashboard', dir: 'backward', des: 'home'}, transition);
   $('#dashboard-button-create').click({src: 'dashboard', dir: 'forward', des: 'appointment-create'}, transition);
+  $('#dashboard-button-create-dog').click({src: 'dashboard', dir: 'forward', des: 'dog-create'}, transition);
 
   /* Appointment Create */
   $('#appointment-create-button-back').click({src: 'appointment-create', dir: 'backward', des: 'dashboard'}, transition);
@@ -31,6 +40,10 @@ $(document).ready(function() {
 
   /* Appointment Detail */
   $('#appointment-detail-button-back').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard'}, transition);
+
+  /* Dog Create */
+  $('#dog-create-button-create').click({src: 'dog-create', dir: 'backward', des: 'dashboard', fn: dogCreate}, transition);
+  $('#dog-create-button-back').click({src: 'dog-create', dir: 'backward', des: 'dashboard'}, transition);
 
   /* Dog Detail */
   $('#dog-detail-button-back').click({src: 'dog-detail', dir: 'backward', des: 'dashboard'}, transition);
@@ -134,6 +147,20 @@ $(document).ready(function() {
     $('#dog-detail-name').val(res.name);
     $('#dog-detail-age').val(res.age);
     $('#dog-detail-breed').val(res.breed);
+  });
+
+  /* Dog Create */
+  function dogCreate() {
+    socket.emit('dog create', {
+      name: $('#dog-create-name').val(),
+      age: parseInt($('#dog-create-age').val()),
+      breed: $('#dog-create-breed').val(),
+      customer: 'admin'
+    });
+    select('loader');
+  }
+  socket.on('dog create success', function(res) {
+    select('dashboard');
   });
 
   /* Profile Fetch */
