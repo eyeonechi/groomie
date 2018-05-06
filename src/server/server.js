@@ -166,8 +166,8 @@ io.on('connection', function(socket) {
   });
 
 });
-
 /*
+
 getAvailableTimes(['10:00', '15:00'], ['11:30', '16:30']);
 getAvailableTimes(['09:00', '11:00', '15:30'], ['10:30', '12:30', '17:00']);
 getAvailableTimes(['14:00', '15:30'], ['15:30', '17:00']);
