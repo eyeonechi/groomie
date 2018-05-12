@@ -64,8 +64,6 @@
           <div class='content-detail'>
             <p>username</p>
             <input id='register-username' type='text'/><br><br>
-            <p>name</p>
-            <input id='register-name' type='text'/><br><br>
             <p>password</p>
             <input id='register-password' type='password'/><br><br>
           </div>
@@ -94,6 +92,29 @@
             <button id='dashboard-button-create'>+ appointment</button>
             <button id='dashboard-button-create-dog'>+ dog</button>
             <button id='dashboard-button-profile'>profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Fragment -->
+      <div id='profile-detail' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>name</p>
+            <input id='profile-detail-name' class='edit-input' readonly='readonly'/><br>
+            <p>email</p>
+            <input id='profile-detail-email' class='edit-input' readonly='readonly'/><br>
+            <p>phone</p>
+            <input id='profile-detail-phone' class='edit-input' readonly='readonly'/><br>
+            <p>birthdate</p>
+            <input id='profile-detail-birthdate' class='edit-input' readonly='readonly' type='date'/><br>
+            <p>address</p>
+            <input id='profile-detail-address' class='edit-input' readonly='readonly'/><br>
+          </div>
+          <div class='content-control'>
+            <button id='profile-detail-button-edit'>edit</button>
+            <button id='profile-detail-button-save' class='edit' style='display: none;'>save</button>
+            <button id='profile-detail-button-back' class='edit-hide'>back</button>
           </div>
         </div>
       </div>
@@ -179,7 +200,7 @@
           </div>
           <div class='content-control'>
             <button id='appointment-detail-button-back'>back</button>
-            <button id='appointment-detail-button-cancel'>- appointment</button>
+            <button id='appointment-detail-button-delete'>- appointment</button>
           </div>
         </div>
       </div>

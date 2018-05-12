@@ -46,27 +46,52 @@ io.on('connection', function(socket) {
 
   socket.on('register', function(data) {
     console.log('register');
+    var query = 'INSERT INTO groomie.Customer (username, password) VALUES (?, ?);';
+    var params = [data.username, data.password];
+    console.log(params);
+    db.query(query, params, function(err, res) {
+      if (err) throw err;
+      socket.emit('register success', res);
+    });
   });
 
   socket.on('login', function(data) {
-    console.log('login');
+    var query = 'SELECT id, username, password, phone FROM groomie.Customer WHERE username=? AND password=?;';
+    var params = [data.username, data.password];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      if (res.length === 0) {
+        socket.emit('login failure');
+      } else {
+        socket.emit('login success', res[0]);
+      }
+    });
   });
 
   socket.on('logout', function(data) {
-    console.log('logout');
+    socket.emit('logout success', {});
+  });
+
+  socket.on('profile fetch', function(data) {
+    var query = 'SELECT id, username, phone FROM groomie.Customer WHERE id=?;';
+    var params = [data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('profile fetch success', res[0]);
+    });
   });
 
   socket.on('summary fetch', function(data) {
     var appointments = [];
     var dogs = [];
-    var query = 'SELECT id FROM groomie.Appointment WHERE id_customer=(SELECT id FROM groomie.Customer WHERE name=?);';
-    var params = [data.customer];
+    var query = 'SELECT id FROM groomie.Appointment WHERE id_customer=(SELECT id FROM groomie.Customer WHERE id=?);';
+    var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       for (var i = 0; i < res.length; i ++) {
         appointments.push(res[i]);
       }
-      var query = 'SELECT name FROM groomie.Dog WHERE id_customer=(SELECT id FROM groomie.Customer WHERE name=?);';
+      var query = 'SELECT id FROM groomie.Dog WHERE id_customer=(SELECT id FROM groomie.Customer WHERE id=?);';
       db.query(query, params, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i ++) {
@@ -82,18 +107,31 @@ io.on('connection', function(socket) {
 
   socket.on('dog create', function(data) {
     console.log(data);
-    var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, (SELECT id FROM groomie.Customer WHERE name=?));';
-    var params = [data.name, data.breed, data.age, data.customer];
+    var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, ?);';
+    var params = [data.name, data.breed, data.age, data.id_customer];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('dog create success', res);
     });
   });
 
+  socket.on('dog delete', function(data) {
+    var query = 'DELETE FROM groomie.Appointment WHERE id_dog=?;';
+    var params = [data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      query = 'DELETE FROM groomie.Dog WHERE id=?;';
+      db.query(query, params, function (err, res) {
+        if (err) throw err;
+        socket.emit('dog delete success', res[0]);
+      });
+    });
+  });
+
   socket.on('dog fetch', function(data) {
     console.log(data);
-    var query = 'SELECT name, age, breed FROM groomie.Dog WHERE name=?;';
-    var params = [data.name];
+    var query = 'SELECT id, name, age, breed FROM groomie.Dog WHERE id=?;';
+    var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('dog fetch success', res[0]);
@@ -102,7 +140,7 @@ io.on('connection', function(socket) {
 
   socket.on('appointment fetch', function(data) {
     console.log(data);
-    var query = 'SELECT location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
+    var query = 'SELECT id, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -112,43 +150,56 @@ io.on('connection', function(socket) {
 
   socket.on('appointment list', function(data) {
     console.log(data);
-    socket.emit('appointment list success', {
-      times: [
-        '09:00-10:30',
-        '09:30-11:00',
-        '10:00-11:30',
-        '10:30-12:00',
-        '11:00-12:30',
-        '11:30-13:00',
-        '12:00-13:30',
-        '12:30-14:00',
-        '13:00-14:30',
-        '13:30-15:00',
-        '14:00-15:30',
-        '14:30-16:00',
-        '15:00-16:30',
-        '15:30-17:00'
-      ],
-      dogs: [
-        'dog1',
-        'dog2',
-        'dog3'
-      ],
-      options: [
-        'wash only',
-        'wash and nail clipping',
-        'deluxe grooming'
-      ]
+    var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
+    var params = [data.id];
+    ret = {};
+    ret.times = [
+      '09:00-10:30',
+      '09:30-11:00',
+      '10:00-11:30',
+      '10:30-12:00',
+      '11:00-12:30',
+      '11:30-13:00',
+      '12:00-13:30',
+      '12:30-14:00',
+      '13:00-14:30',
+      '13:30-15:00',
+      '14:00-15:30',
+      '14:30-16:00',
+      '15:00-16:30',
+      '15:30-17:00'
+    ];
+    ret.options = [
+      'wash only',
+      'wash and nail clipping',
+      'deluxe grooming'
+    ];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      ret.dogs = [];
+      for (var i = 0; i < res.length; i ++) {
+        ret.dogs.push(res[i]);
+      }
+      socket.emit('appointment list success', ret);
     });
   });
 
   socket.on('appointment create', function(data) {
-    var query = 'INSERT INTO groomie.Appointment (time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, (SELECT id FROM groomie.Customer WHERE name=?), ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
-    var params = [data.time.split('-')[0], data.time.split('-')[1], data.customer, 1, data.dog, data.option, data.address, data.instructions];
+    var query = 'INSERT INTO groomie.Appointment (time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
+    var params = [data.time.split('-')[0], data.time.split('-')[1], data.id_customer, 1, data.dog, data.option, data.address, data.instructions];
     console.log(params);
     db.query(query, params, function (err, res) {
       if (err) throw err;
-      socket.emit('register success', res);
+      socket.emit('appointment create success', res);
+    });
+  });
+
+  socket.on('appointment delete', function(data) {
+    var query = 'DELETE FROM groomie.Appointment WHERE id=?;';
+    var params = [data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('appointment delete success', res);
     });
   });
 
