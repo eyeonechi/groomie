@@ -83,6 +83,10 @@ class Groomer {
     if (obj.id) this.id = obj.id;
     if (obj.name) this.name = obj.name;
   }
+  update(obj) {
+    if (obj.id) this.id = obj.id;
+    if (obj.name) this.name = obj.name;
+  }
 }
 
 class Appointment {
@@ -103,7 +107,7 @@ class Appointment {
     if (obj.location) this.location = obj.location;
     if (obj.time_start) this.time_start = obj.time_start;
     if (obj.time_end) this.time_end = obj.time_end;
-    if (obj.instruction) this.instructions = obj.instructions;
+    if (obj.instructions) this.instructions = obj.instructions;
     if (obj.groom_option) this.groom_option = obj.groom_option;
     if (obj.dog) this.dog = obj.dog;
     if (obj.selected) this.selected = obj.selected;
@@ -134,6 +138,7 @@ $(document).ready(function() {
   $('#register-button-back').click({src: 'register', dir: 'backward', des: 'home'}, transition);
 
   /* Dashboard */
+  $('#dashboard-image').click({src: 'dashboard', dir: 'forward', des: 'profile-detail', fn: profileFetch}, transition);
   $('#dashboard-button-logout').click({src: 'dashboard', dir: 'backward', des: 'home', fn: logout}, transition);
   $('#dashboard-button-create').click({src: 'dashboard', dir: 'forward', des: 'appointment-create'}, transition);
   $('#dashboard-button-create-dog').click({src: 'dashboard', dir: 'forward', des: 'dog-create'}, transition);
@@ -141,7 +146,8 @@ $(document).ready(function() {
 
   /* Profile Detail */
   $('#profile-detail-button-edit').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileEdit}, transition);
-  $('#profile-detail-button-back').click({src: 'profile-detail', dir: 'backward', des: 'home'}, transition);
+  $('#profile-detail-button-save').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileUpdate}, transition);
+  $('#profile-detail-button-back').click({src: 'profile-detail', dir: 'backward', des: 'dashboard'}, transition);
 
   /* Appointment Create */
   $('#appointment-create-button-back').click({src: 'appointment-create', dir: 'backward', des: 'dashboard'}, transition);
@@ -152,6 +158,8 @@ $(document).ready(function() {
   $('#appointment-create-2-button-back').click({src: 'appointment-create-2', dir: 'backward', des: 'appointment-create'}, transition);
 
   /* Appointment Detail */
+  $('#appointment-detail-button-edit').click({src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentEdit}, transition);
+  $('#appointment-detail-button-save').click({src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentUpdate}, transition);
   $('#appointment-detail-button-delete').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard', fn: appointmentDelete}, transition);
   $('#appointment-detail-button-back').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard'}, transition);
 
@@ -160,6 +168,8 @@ $(document).ready(function() {
   $('#dog-create-button-back').click({src: 'dog-create', dir: 'backward', des: 'dashboard'}, transition);
 
   /* Dog Detail */
+  $('#dog-detail-button-edit').click({src: 'dog-detail', dir: 'forward', des: 'dog-detail', fn: dogEdit}, transition);
+  $('#dog-detail-button-save').click({src: 'dog-detail', dir: 'forward', des: 'dog-detail', fn: dogUpdate}, transition);
   $('#dog-detail-button-delete').click({src: 'dog-detail', dir: 'backward', des: 'dashboard', fn: dogDelete}, transition);
   $('#dog-detail-button-back').click({src: 'dog-detail', dir: 'backward', des: 'dashboard'}, transition);
 
@@ -180,6 +190,7 @@ $(document).ready(function() {
   }
   socket.on('login success', function(res) {
     customer = new Customer(res);
+    document.getElementById('dashboard-welcome').innerHTML = 'welcome, ' + res.username;
     summaryFetch();
   });
   socket.on('login failure', function(res) {
@@ -223,7 +234,6 @@ $(document).ready(function() {
     clear('dashboard-appointments');
     clear('dashboard-dogs');
     customer.update(res);
-    console.log(customer);
     var appointments = $('#dashboard-appointments');
     var dogs = $('#dashboard-dogs');
     for (var i = 0; i < res.appointments.length; i ++) {
@@ -235,20 +245,41 @@ $(document).ready(function() {
 
     // onclick
     appointments.on('click', 'li', function() {
-      socket.emit('appointment fetch', {
-        id: $(this).html()
-      });
+      for (let appointment of customer.appointments) {
+        if (appointment.id === parseInt($(this).html())) {
+          appointment.selected = true;
+        } else {
+          appointment.selected = false;
+        }
+      }
+      appointmentFetch();
     });
     dogs.on('click', 'li', function() {
-      socket.emit('dog fetch', {
-        id: $(this).html()
-      });
+      for (let dog of customer.dogs) {
+        if (dog.id === parseInt($(this).html())) {
+          dog.selected = true;
+        } else {
+          dog.selected = false;
+        }
+      }
+      dogFetch();
+      console.log(customer.dogs);
     });
   });
   socket.on('summary fetch failure', function(res) {
   });
 
   /* Appointment Fetch */
+  function appointmentFetch() {
+    for (let appointment of customer.appointments) {
+      if (appointment.selected) {
+        socket.emit('appointment fetch', {
+          id: appointment.id
+        });
+        break;
+      }
+    }
+  }
   socket.on('appointment fetch success', function(res) {
     res.selected = true;
     customer.setAppointment(res);
@@ -262,6 +293,16 @@ $(document).ready(function() {
   });
 
   /* Dog Fetch */
+  function dogFetch() {
+    for (let dog of customer.dogs) {
+      if (dog.selected) {
+        socket.emit('dog fetch', {
+          id: dog.id
+        });
+        break;
+      }
+    }
+  }
   socket.on('dog fetch success', function(res) {
     res.selected = true;
     customer.setDog(res);
@@ -310,13 +351,11 @@ $(document).ready(function() {
     select('loader');
   }
   socket.on('profile fetch success', function(res) {
-    console.log(res);
     transition({data: {src: 'dashboard', dir: 'forward', des: 'profile-detail'}});
     $('#profile-detail-name').val(res.username);
-    //$('#profile-detail-email').val(res.email);
+    $('#profile-detail-email').val(res.email);
     $('#profile-detail-phone').val(res.phone);
-    //$('#profile-detail-birthdate').val(res.birthdate);
-    //$('#profile-detail-address').val(res.address);
+    $('#profile-detail-address').val(res.address);
   });
   socket.on('profile fetch failure', function(res) {
   });
@@ -351,10 +390,102 @@ $(document).ready(function() {
     }
   }
 
+  /* Dog Edit */
+  function dogEdit() {
+    var edits = document.getElementsByClassName('edit');
+    var editHides = document.getElementsByClassName('edit-hide');
+    var editInputs = $('.edit-input');
+    if (editing === true) {
+      document.getElementById('dog-detail-button-edit').innerHTML = 'edit';
+      editInputs.prop('readonly', true);
+      editInputs.removeClass('input-editing');
+      for (var i = 0; i < edits.length; i ++) {
+        edits[i].style.display = 'none';
+      }
+      for (var i = 0; i < editHides.length; i ++) {
+        editHides[i].style.display = 'inline-block';
+      }
+      editing = false;
+    } else if (editing === false) {
+      document.getElementById('dog-detail-button-edit').innerHTML = 'cancel';
+      editInputs.prop('readonly', false);
+      editInputs.addClass('input-editing');
+      for (var i = 0; i < edits.length; i ++) {
+        edits[i].style.display = 'inline-block';
+      }
+      for (var i = 0; i < editHides.length; i ++) {
+        editHides[i].style.display = 'none';
+      }
+      editing = true;
+    }
+  }
+
+  /* Appointment Edit */
+  function appointmentEdit() {
+    var edits = document.getElementsByClassName('edit');
+    var editHides = document.getElementsByClassName('edit-hide');
+    var editInputs = $('.edit-input');
+    if (editing === true) {
+      document.getElementById('appointment-detail-button-edit').innerHTML = 'edit';
+      editInputs.prop('readonly', true);
+      editInputs.removeClass('input-editing');
+      for (var i = 0; i < edits.length; i ++) {
+        edits[i].style.display = 'none';
+      }
+      for (var i = 0; i < editHides.length; i ++) {
+        editHides[i].style.display = 'inline-block';
+      }
+      editing = false;
+    } else if (editing === false) {
+      document.getElementById('appointment-detail-button-edit').innerHTML = 'cancel';
+      editInputs.prop('readonly', false);
+      editInputs.addClass('input-editing');
+      for (var i = 0; i < edits.length; i ++) {
+        edits[i].style.display = 'inline-block';
+      }
+      for (var i = 0; i < editHides.length; i ++) {
+        editHides[i].style.display = 'none';
+      }
+      editing = true;
+    }
+  }
+
   /* Profile Update */
   function profileUpdate() {
+    socket.emit('profile update', {
+      id: customer.id,
+      name: $('#profile-detail-name').val(),
+      email: $('#profile-detail-email').val(),
+      phone: $('#profile-detail-phone').val(),
+      address: $('#profile-detail-address').val()
+    });
   }
   socket.on('profile update success', function(res) {
+    snackbar('profile update success');
+    profileEdit();
+    transition({data: {src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileFetch}});
+  });
+  socket.on('profile update failure', function(res) {
+  });
+
+  /* Dog Update */
+  function dogUpdate() {
+    for (let dog of customer.dogs) {
+      if (dog.selected) {
+        socket.emit('dog update', {
+          id: dog.id,
+          name: $('#dog-detail-name').val(),
+          age: $('#dog-detail-age').val(),
+          breed: $('#dog-detail-breed').val()
+        });
+        break;
+      }
+    }
+  }
+  socket.on('dog update success', function(res) {
+    snackbar('dog update success');
+    dogEdit();
+    transition({data: {src: 'dog-detail', dir: 'forward', des: 'dog-detail', fn: dogFetch}});
   });
   socket.on('profile update failure', function(res) {
   });
@@ -409,14 +540,6 @@ $(document).ready(function() {
   socket.on('appointment create failure', function(res) {
   });
 
-  /* Appointment Fetch */
-  function appointmentFetch() {
-  }
-  socket.on('appointment fetch success', function(res) {
-  });
-  socket.on('appointment fetch failure', function(res) {
-  });
-
   /* Appointment Delete */
   function appointmentDelete() {
     for (let appointment of customer.appointments) {
@@ -434,14 +557,22 @@ $(document).ready(function() {
   socket.on('appointment delete failure', function(res) {
   });
 
-  /* Appointment Edit */
-  function appointmentEdit() {
-  }
-
   /* Appointment Update */
   function appointmentUpdate() {
+    for (let appointment of customer.appointments) {
+      if (appointment.selected) {
+        socket.emit('appointment update', {
+          id: appointment.id,
+          instructions: $('#appointment-detail-instructions').val()
+        });
+        break;
+      }
+    }
   }
   socket.on('appointment update success', function(res) {
+    snackbar('appointment update success');
+    appointmentEdit();
+    transition({data: {src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentFetch}});
   });
   socket.on('appointment update failure', function(res) {
   });

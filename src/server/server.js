@@ -45,10 +45,8 @@ io.on('connection', function(socket) {
   console.log('connection established');
 
   socket.on('register', function(data) {
-    console.log('register');
     var query = 'INSERT INTO groomie.Customer (username, password) VALUES (?, ?);';
     var params = [data.username, data.password];
-    console.log(params);
     db.query(query, params, function(err, res) {
       if (err) throw err;
       socket.emit('register success', res);
@@ -73,11 +71,38 @@ io.on('connection', function(socket) {
   });
 
   socket.on('profile fetch', function(data) {
-    var query = 'SELECT id, username, phone FROM groomie.Customer WHERE id=?;';
+    var query = 'SELECT id, username, email, phone, address FROM groomie.Customer WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('profile fetch success', res[0]);
+    });
+  });
+
+  socket.on('profile update', function(data) {
+    var query = 'UPDATE groomie.Customer SET username=?, email=?, phone=?, address=? WHERE id=?;';
+    var params = [data.name, data.email, data.phone, data.address, data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('profile update success', res);
+    });
+  });
+
+  socket.on('dog update', function(data) {
+    var query = 'UPDATE groomie.Dog SET name=?, age=?, breed=? WHERE id=?;';
+    var params = [data.name, data.age, data.breed, data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('dog update success', res);
+    });
+  });
+
+  socket.on('appointment update', function(data) {
+    var query = 'UPDATE groomie.Appointment SET instructions=? WHERE id=?;';
+    var params = [data.instructions, data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('appointment update success', res);
     });
   });
 
@@ -106,7 +131,6 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog create', function(data) {
-    console.log(data);
     var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, ?);';
     var params = [data.name, data.breed, data.age, data.id_customer];
     db.query(query, params, function (err, res) {
@@ -129,7 +153,6 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog fetch', function(data) {
-    console.log(data);
     var query = 'SELECT id, name, age, breed FROM groomie.Dog WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
@@ -139,7 +162,6 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment fetch', function(data) {
-    console.log(data);
     var query = 'SELECT id, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
@@ -149,7 +171,6 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment list', function(data) {
-    console.log(data);
     var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
     var params = [data.id];
     ret = {};
@@ -187,7 +208,6 @@ io.on('connection', function(socket) {
   socket.on('appointment create', function(data) {
     var query = 'INSERT INTO groomie.Appointment (time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
     var params = [data.time.split('-')[0], data.time.split('-')[1], data.id_customer, 1, data.dog, data.option, data.address, data.instructions];
-    console.log(params);
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('appointment create success', res);
@@ -217,77 +237,3 @@ io.on('connection', function(socket) {
   });
 
 });
-/*
-
-getAvailableTimes(['10:00', '15:00'], ['11:30', '16:30']);
-getAvailableTimes(['09:00', '11:00', '15:30'], ['10:30', '12:30', '17:00']);
-getAvailableTimes(['14:00', '15:30'], ['15:30', '17:00']);
-getAvailableTimes(['09:30'], ['11:00']);
-
-function getAvailableTimes(time_starts, time_ends) {
-  var intervals = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
-
-  var available = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
-  var available1 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
-  var available2 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
-  var available3 = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
-  for (var i = 0; i < available.length; i ++) {
-    for (var j = 0; j < time_starts.length; j ++) {
-      if (available[i] === time_starts[j]) {
-        available.splice(i, 3);
-      }
-    }
-  }
-  for (var i = 0; i < available1.length; i ++) {
-    for (var j = 0; j < time_starts.length; j ++) {
-      if (available1[i] === time_starts[j]) {
-        available1.splice(i - 2, 2);
-      }
-    }
-  }
-  for (var i = 0; i < available3.length; i ++) {
-    for (var j = 0; j < time_starts.length; j ++) {
-      if (available3[i] === time_starts[j]) {
-        available3.splice(i - 1, 1);
-      }
-    }
-  }
-  for (var i = 0; i < available2.length; i ++) {
-    for (var j = 0; j < time_ends.length; j ++) {
-      if (available2[i] === time_ends[j]) {
-        available2.splice(i - 2, 2);
-      }
-    }
-  }
-
-  var final = []
-  var finalfinal = []
-  var finalfinalfinal = []
-  for (var i = 0; i < available.length; i ++) {
-    for (var j = 0; j < available2.length; j ++) {
-      if (available[i] === available2[j]) {
-        final.push(available[i]);
-      }
-    }
-  }
-  for (var i = 0 ; i < final.length; i ++) {
-    for (var j = 0; j < available1.length; j ++) {
-      if (final[i] === available1[j]) {
-        finalfinal.push(final[i])
-      }
-    }
-  }
-  for (var i = 0 ; i < finalfinal.length; i ++) {
-    for (var j = 0; j < available3.length; j ++) {
-      if (finalfinal[i] === available3[j]) {
-        finalfinalfinal.push(finalfinal[i])
-      }
-    }
-  }
-
-  //console.log(available);
-  //console.log(available2);
-  console.log(finalfinalfinal);
-  console.log();
-}
-*/

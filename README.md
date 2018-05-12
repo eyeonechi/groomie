@@ -21,13 +21,18 @@ Trello:
 https://trello.com/b/MOYBhqT9/swen900016
 
 ## Instructions
-Auto:
-make install
-make run
+### MySQL Database
+install MySQL Server and MySQL Workbench
+start MySQL server service:
+  sudo service mysql start
+create new database connection in MySQL Workbench
+cd into src/database and open groomie.mwb with MySQL Workbench
+click Database -> Forward Engineer -> Select new connection and finish setup
 
-Manual:
-cd src/server
+### Node.js Server
+cd into src/server directory
 npm install
-sudo service mysql start
 node server.js
+
+### Web Client
 open localhost:3000 in browser

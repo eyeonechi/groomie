@@ -79,7 +79,7 @@
         <div class='canvas'>
           <div class='content-detail'>
             <img id='dashboard-image' src='images/user.png' alt='profile-picture'/><br>
-            <h2>welcome, user</h2>
+            <h2 id='dashboard-welcome'></h2>
             <p>my appointments</p><br>
             <ul id='dashboard-appointments'></ul><br>
 
@@ -89,8 +89,8 @@
           </div>
           <div class='content-control'>
             <button id='dashboard-button-logout'>logout</button>
-            <button id='dashboard-button-create'>+ appointment</button>
-            <button id='dashboard-button-create-dog'>+ dog</button>
+            <button id='dashboard-button-create'>+appointment</button>
+            <button id='dashboard-button-create-dog'>+dog</button>
             <button id='dashboard-button-profile'>profile</button>
           </div>
         </div>
@@ -106,8 +106,6 @@
             <input id='profile-detail-email' class='edit-input' readonly='readonly'/><br>
             <p>phone</p>
             <input id='profile-detail-phone' class='edit-input' readonly='readonly'/><br>
-            <p>birthdate</p>
-            <input id='profile-detail-birthdate' class='edit-input' readonly='readonly' type='date'/><br>
             <p>address</p>
             <input id='profile-detail-address' class='edit-input' readonly='readonly'/><br>
           </div>
@@ -144,7 +142,11 @@
                   </tbody>
                 </table>
               </div>
-            </div>
+            </div><br>
+            <h5>For any further enquiries, please contact:</h5>
+            <h5>Tom</h5>
+            <h5>phone: 0123456789</h5>
+            <h5>email: tom@groomie.com</h5>
           </div>
           <div class='content-control'>
             <button id='appointment-create-button-back'>back</button>
@@ -186,21 +188,23 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>date</p>
-            <input id='appointment-detail-date' type='date'/>
+            <input id='appointment-detail-date' readonly='readonly' type='date'/>
             <p>time</p>
-            <input id='appointment-detail-time' type='text'/>
+            <input id='appointment-detail-time' readonly='readonly' type='text'/>
             <p>dog</p>
-            <input id='appointment-detail-dog' type='text'/>
+            <input id='appointment-detail-dog' readonly='readonly' type='text'/>
             <p>groomer</p>
-            <input id='appointment-detail-groomer' type='text'/>
+            <input id='appointment-detail-groomer' readonly='readonly' type='text'/>
             <p>option</p>
-            <input id='appointment-detail-option' type='text'/>
+            <input id='appointment-detail-option' readonly='readonly' type='text'/>
             <p>instructions</p>
-            <input id='appointment-detail-instructions' type='text'/>
+            <input id='appointment-detail-instructions' class='edit-input' readonly='readonly' type='text'/>
           </div>
           <div class='content-control'>
-            <button id='appointment-detail-button-back'>back</button>
-            <button id='appointment-detail-button-delete'>- appointment</button>
+            <button id='appointment-detail-button-edit'>edit</button>
+            <button id='appointment-detail-button-save' class='edit' style='display: none;'>save</button>
+            <button id='appointment-detail-button-delete' class='edit' style='display: none;'>delete</button>
+            <button id='appointment-detail-button-back' class='edit-hide'>back</button>
           </div>
         </div>
       </div>
@@ -228,15 +232,17 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>name</p>
-            <input id='dog-detail-name' type='text'/>
+            <input id='dog-detail-name' class='edit-input' readonly='readonly' type='text'/>
             <p>age</p>
-            <input id='dog-detail-age' type='text'/>
+            <input id='dog-detail-age' class='edit-input' readonly='readonly' type='text'/>
             <p>breed</p>
-            <input id='dog-detail-breed' type='text'/>
+            <input id='dog-detail-breed' class='edit-input' readonly='readonly' type='text'/>
           </div>
           <div class='content-control'>
-            <button id='dog-detail-button-back'>back</button>
-            <button id='dog-detail-button-delete'>- dog</button>
+            <button id='dog-detail-button-edit'>edit</button>
+            <button id='dog-detail-button-save' class='edit' style='display: none;'>save</button>
+            <button id='dog-detail-button-delete' class='edit' style='display: none;'>delete</button>
+            <button id='dog-detail-button-back' class='edit-hide'>back</button>
           </div>
         </div>
       </div>
