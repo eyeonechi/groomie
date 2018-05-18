@@ -6,6 +6,8 @@
  * Team Orange
  */
 
+'use strict';
+
 var HOST    = 'localhost';
 var PORT    = 3000;
 
@@ -22,6 +24,12 @@ var db      = mysql.createConnection({
   database : 'groomie',
   port     : 3306
 });
+
+var groom_options = [
+  'wash only',
+  'wash and nail clipping',
+  'deluxe grooming'
+];
 
 // Listen on specified port
 server.listen(PORT, HOST, function() {
@@ -173,35 +181,26 @@ io.on('connection', function(socket) {
   socket.on('appointment list', function(data) {
     var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
     var params = [data.id];
-    ret = {};
-    ret.times = [
-      '09:00-10:30',
-      '09:30-11:00',
-      '10:00-11:30',
-      '10:30-12:00',
-      '11:00-12:30',
-      '11:30-13:00',
-      '12:00-13:30',
-      '12:30-14:00',
-      '13:00-14:30',
-      '13:30-15:00',
-      '14:00-15:30',
-      '14:30-16:00',
-      '15:00-16:30',
-      '15:30-17:00'
-    ];
-    ret.options = [
-      'wash only',
-      'wash and nail clipping',
-      'deluxe grooming'
-    ];
+    var ret = {};
+    ret.options = groom_options;
     db.query(query, params, function (err, res) {
       if (err) throw err;
       ret.dogs = [];
       for (var i = 0; i < res.length; i ++) {
         ret.dogs.push(res[i]);
       }
-      socket.emit('appointment list success', ret);
+      var query = 'SELECT time_start FROM groomie.Appointment WHERE date=?;';
+      var params = ['2018-05-05'];
+      db.query(query, params, function (err, res) {
+        if (err) throw err;
+        var scheduled = [];
+        for (var i = 0; i < res.length; i ++) {
+          scheduled.push(res[i].time_start);
+        }
+        ret.times = generateAvailableTimes(scheduled);
+        console.log(ret.times);
+        socket.emit('appointment list success', ret);
+      });
     });
   });
 
@@ -237,3 +236,61 @@ io.on('connection', function(socket) {
   });
 
 });
+
+function generateAvailableTimes(time_starts) {
+  console.log(time_starts);
+  var times = ['09:00:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00'];
+  for (var i = 0; i < time_starts.length; i ++) {
+    var negates = generateNegatingTimes(time_starts[i]);
+    for (var j = 0; j < times.length; j ++) {
+      for (var k = 0; k < negates.length; k ++) {
+        if (times[j] === negates[k]) {
+          var index = times.indexOf(times[j]);
+          if (index > -1) {
+            times.splice(index, 1);
+          }
+        }
+      }
+    }
+  }
+  return(times);
+}
+
+function generateNegatingTimes(time_start) {
+  console.log(time_start);
+  var times = {
+    0:'09:00:00',
+    1:'09:30:00',
+    2:'10:00:00',
+    3:'10:30:00',
+    4:'11:00:00',
+    5:'11:30:00',
+    6:'12:00:00',
+    7:'12:30:00',
+    8:'13:00:00',
+    9:'13:30:00',
+    10:'14:00:00',
+    11:'14:30:00',
+    12:'15:00:00',
+    13:'15:30:00'
+  }
+  var available = ['09:00:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00'];
+  var keys = Object.keys(times);
+  var i;
+  for (let key of keys) {
+    if (times[key] === time_start) {
+      i = parseInt(key);
+    }
+  }
+  if (i == 0) {
+    return(available.slice(i, i+3));
+  } else if (i == 1) {
+    return(available.slice(i-1, i+3));
+  } else if (i == keys.length-1) {
+    return(available.slice(i-2, i+1));
+  } else if (i == keys.length-2) {
+    return(available.slice(i-2, i+2));
+  } else {
+    return(available.slice(i-2, i+3));
+  }
+}
