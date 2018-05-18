@@ -53,6 +53,7 @@
           <div class='content-control'>
             <button id='home-button-login'>login</button>
             <button id='home-button-register'>register</button>
+            <button id='home-button-reset-password'>reset pw</button>
             <button id='home-button-about'>about</button>
           </div>
         </div>
@@ -70,6 +71,20 @@
           <div class='content-control'>
             <button id='register-button-register'>register</button>
             <button id='register-button-back'>back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Password Fragment -->
+      <div id='reset-password' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>email</p>
+            <input id='reset-password-email' type='text'/><br><br>
+          </div>
+          <div class='content-control'>
+            <button id='reset-password-button-back'>back</button>
+            <button id='reset-password-button-reset'>reset</button>
           </div>
         </div>
       </div>
@@ -92,6 +107,20 @@
             <button id='dashboard-button-create'>+appointment</button>
             <button id='dashboard-button-create-dog'>+dog</button>
             <button id='dashboard-button-profile'>profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Dashboard Fragment -->
+      <div id='admin-dashboard' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>all appointments</p><br>
+            <ul id='admin-dashboard-appointments'></ul>
+          </div>
+          <div class='content-control'>
+            <button id='admin-dashboard-button-logout'>logout</button>
+            <button id='admin-dashboard-button-profile'>profile</button>
           </div>
         </div>
       </div>
@@ -159,7 +188,8 @@
       <div id='appointment-create-2' class='content'>
         <div class='canvas'>
           <div class='content-detail'>
-            <h2>date dd/mm/yyyy</h2><br>
+            <h2>select date</h2><br>
+            <input id='appointment-create-2-date' type='date'/>
 
             <h2>select time</h2><br>
             <select id='appointment-create-2-times'></select>
@@ -188,15 +218,15 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>date</p>
-            <input id='appointment-detail-date' readonly='readonly' type='date'/>
+            <input id='appointment-detail-date' class='edit-input' readonly='readonly' type='date'/>
             <p>time</p>
-            <input id='appointment-detail-time' readonly='readonly' type='text'/>
+            <select id='appointment-detail-times' class='edit-input' readonly='readonly'></select>
             <p>dog</p>
-            <input id='appointment-detail-dog' readonly='readonly' type='text'/>
+            <select id='appointment-detail-dogs' class='edit-input' readonly='readonly'></select>
             <p>groomer</p>
             <input id='appointment-detail-groomer' readonly='readonly' type='text'/>
             <p>option</p>
-            <input id='appointment-detail-option' readonly='readonly' type='text'/>
+            <select id='appointment-detail-options' class='edit-input' readonly='readonly'></select>
             <p>instructions</p>
             <input id='appointment-detail-instructions' class='edit-input' readonly='readonly' type='text'/>
           </div>

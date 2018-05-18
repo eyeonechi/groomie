@@ -30,6 +30,7 @@ class Dog {
 class Customer {
   constructor(obj) {
     if (obj.id) this.id = obj.id;
+    if (obj.username) this.username = obj.username;
     if (obj.name) this.name = obj.name;
     if (obj.phone) this.phone = obj.phone;
     if (obj.appointments) {
@@ -132,36 +133,47 @@ $(document).ready(function() {
   $('#home-button-about').click({src: 'home', dir: 'forward', des: 'about'}, transition);
   $('#home-button-login').click({src: 'home', dir: 'forward', des: 'dashboard', fn: login}, transition);
   $('#home-button-register').click({src: 'home', dir: 'forward', des: 'register'}, transition);
+  $('#home-button-reset-password').click({src: 'home', dir: 'forward', des: 'reset-password'}, transition);
 
   /* Register */
   $('#register-button-register').click({src: 'register', dir: 'backward', des: 'home', fn: register}, transition);
   $('#register-button-back').click({src: 'register', dir: 'backward', des: 'home'}, transition);
 
+  /* Reset Password */
+  $('#reset-password-button-reset').click({src: 'reset-password', dir: 'backward', des: 'home', fn: resetPassword}, transition);
+  $('#reset-password-button-back').click({src: 'reset-password', dir: 'backward', des: 'home'}, transition);
+
   /* Dashboard */
   $('#dashboard-image').click({src: 'dashboard', dir: 'forward', des: 'profile-detail', fn: profileFetch}, transition);
   $('#dashboard-button-logout').click({src: 'dashboard', dir: 'backward', des: 'home', fn: logout}, transition);
-  $('#dashboard-button-create').click({src: 'dashboard', dir: 'forward', des: 'appointment-create'}, transition);
+  $('#dashboard-button-create').click({src: 'dashboard', dir: 'forward', des: 'appointment-create', fn: appointmentList}, transition);
   $('#dashboard-button-create-dog').click({src: 'dashboard', dir: 'forward', des: 'dog-create'}, transition);
   $('#dashboard-button-profile').click({src: 'dashboard', dir: 'forward', des: 'profile', fn: profileFetch}, transition);
+
+  /* Admin Dashboard */
+  $('#admin-dashboard-button-profile').click({src: 'admin-dashboard', dir: 'forward', des: 'profile-detail', fn: profileFetch}, transition);
+  $('#admin-dashboard-button-logout').click({src: 'admin-dashboard', dir: 'backward', des: 'home', fn: logout}, transition);
 
   /* Profile Detail */
   $('#profile-detail-button-edit').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileEdit}, transition);
   $('#profile-detail-button-save').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileUpdate}, transition);
-  $('#profile-detail-button-back').click({src: 'profile-detail', dir: 'backward', des: 'dashboard'}, transition);
+  $('#profile-detail-button-back').click({src: 'profile-detail', dir: 'backward', des: 'dashboard', fn: profileDetailBack}, transition);
 
   /* Appointment Create */
   $('#appointment-create-button-back').click({src: 'appointment-create', dir: 'backward', des: 'dashboard'}, transition);
   $('#appointment-create-button-next').click({src: 'appointment-create', dir: 'forward', des: 'appointment-create-2', fn: appointmentList}, transition);
 
   /* Appointment Create 2 */
+  $('#appointment-create-2-date').change(appointmentList);
   $('#appointment-create-2-button-create').click({src: 'appointment-create-2', dir: 'backward', des: 'dashboard', fn: appointmentCreate}, transition);
-  $('#appointment-create-2-button-back').click({src: 'appointment-create-2', dir: 'backward', des: 'appointment-create'}, transition);
+  $('#appointment-create-2-button-back').click({src: 'appointment-create-2', dir: 'backward', des: 'dashboard'}, transition);
 
   /* Appointment Detail */
+  $('#appointment-detail-date').change(appointmentList2);
   $('#appointment-detail-button-edit').click({src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentEdit}, transition);
   $('#appointment-detail-button-save').click({src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentUpdate}, transition);
   $('#appointment-detail-button-delete').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard', fn: appointmentDelete}, transition);
-  $('#appointment-detail-button-back').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard'}, transition);
+  $('#appointment-detail-button-back').click({src: 'appointment-detail', dir: 'backward', des: 'dashboard', fn: appointmentDetailBack}, transition);
 
   /* Dog Create */
   $('#dog-create-button-create').click({src: 'dog-create', dir: 'backward', des: 'dashboard', fn: dogCreate}, transition);
@@ -191,7 +203,11 @@ $(document).ready(function() {
   socket.on('login success', function(res) {
     customer = new Customer(res);
     document.getElementById('dashboard-welcome').innerHTML = 'welcome, ' + res.username;
-    summaryFetch();
+    if (res.username === 'admin') {
+      adminSummaryFetch();
+    } else {
+      summaryFetch();
+    }
   });
   socket.on('login failure', function(res) {
     snackbar('login failure');
@@ -203,6 +219,7 @@ $(document).ready(function() {
     socket.emit('logout', {
       id: customer.id
     });
+    select('loader');
   }
   socket.on('logout success', function(res) {
     transition({data: {src: 'dashboard', dir: 'backward', des: 'home'}});
@@ -216,6 +233,7 @@ $(document).ready(function() {
       username: $('#register-username').val(),
       password: $('#register-password').val()
     });
+    select('loader');
   }
   socket.on('register success', function(res) {
     transition({data: {src: 'register', dir: 'backward', des: 'home'}});
@@ -223,11 +241,51 @@ $(document).ready(function() {
   socket.on('register failure', function(res) {
   });
 
+  /* Reset Password */
+  function resetPassword() {
+    socket.emit('reset password', {
+      email: $('#reset-password-email').val()
+    });
+    select('loader');
+  }
+  socket.on('reset password success', function(res) {
+    transition({data: {src: 'reset-password', dir: 'backward', des: 'home'}});
+  });
+
+  /* Admin Summary Fetch */
+  function adminSummaryFetch() {
+    socket.emit('admin summary fetch', {
+      id: customer.id
+    });
+    select('loader');
+  }
+  socket.on('admin summary fetch success', function(res) {
+    transition({data: {src: 'home', dir: 'forward', des: 'admin-dashboard'}});
+    clear('admin-dashboard-appointments');
+    console.log(res);
+    customer.update(res);
+    var appointments = $('#admin-dashboard-appointments');
+    for (var i = 0; i < res.appointments.length; i ++) {
+      appointments.append('<li>' + res.appointments[i].id + '</li>');
+    }
+    appointments.on('click', 'li', function() {
+      for (let appointment of customer.appointments) {
+        if (appointment.id === parseInt($(this).html())) {
+          appointment.selected = true;
+        } else {
+          appointment.selected = false;
+        }
+      }
+      appointmentFetch();
+    });
+  });
+
   /* Summary Fetch */
   function summaryFetch() {
     socket.emit('summary fetch', {
       id: customer.id
     });
+    select('loader');
   }
   socket.on('summary fetch success', function(res) {
     transition({data: {src: 'login', dir: 'forward', des: 'dashboard'}});
@@ -284,13 +342,34 @@ $(document).ready(function() {
     res.selected = true;
     customer.setAppointment(res);
     transition({data: {src: 'dashboard', dir: 'forward', des: 'appointment-detail'}});
+    clear('appointment-detail-times');
+    clear('appointment-detail-dogs');
+    clear('appointment-detail-options');
+    $('#appointment-detail-times').append('<option>' + res.time_start + '-' + res.time_end + '</option>');
+    $('#appointment-detail-dogs').append('<option>' + res.dog + '</option>');
+    $('#appointment-detail-options').append('<option>' + res.groom_option + '</option>');
     $('#appointment-detail-date').val(res.date);
-    $('#appointment-detail-time').val(res.time_start + '-' + res.time_end);
-    $('#appointment-detail-dog').val(res.dog);
     $('#appointment-detail-groomer').val(res.groomer);
-    $('#appointment-detail-option').val(res.groom_option);
     $('#appointment-detail-instructions').val(res.instructions);
   });
+
+  /* Appointment Detail Back */
+  function appointmentDetailBack() {
+    if (customer.username === 'admin') {
+      transition({data: {src: 'appointment-detail', dir: 'backward', des: 'admin-dashboard'}});
+    } else {
+      transition({data: {src: 'appointment-detail', dir: 'backward', des: 'dashboard'}});
+    }
+  }
+
+  /* Profile Detail Back */
+  function profileDetailBack() {
+    if (customer.username === 'admin') {
+      transition({data: {src: 'profile-detail', dir: 'backward', des: 'admin-dashboard'}});
+    } else {
+      transition({data: {src: 'profile-detail', dir: 'backward', des: 'dashboard'}});
+    }
+  }
 
   /* Dog Fetch */
   function dogFetch() {
@@ -338,6 +417,7 @@ $(document).ready(function() {
     select('loader');
   }
   socket.on('dog delete success', function(res) {
+    dogEdit();
     transition({data: {src: 'appointment-create', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
   });
   socket.on('dog delete failure', function(res) {
@@ -492,15 +572,17 @@ $(document).ready(function() {
 
   /* Appointment List */
   function appointmentList() {
+    if ($('#appointment-create-2-date').val() === null) {
+      $('#appointment-create-2-date').val(new DateTime.Today.ToString('yyyy-MM-dd'));
+    }
     socket.emit('appointment list', {
       id: customer.id,
-      date: '2018-05-05'
+      date: $('#appointment-create-2-date').val()
     });
     select('loader');
   }
   socket.on('appointment list success', function(res) {
     transition({data: {src: 'appointment-create', dir: 'forward', des: 'appointment-create-2'}});
-    console.log(res);
     var times = $('#appointment-create-2-times');
     var dogs = $('#appointment-create-2-dogs');
     var options = $('#appointment-create-2-options');
@@ -522,9 +604,36 @@ $(document).ready(function() {
   socket.on('appointment list failure', function(res) {
   });
 
+  function appointmentList2() {
+    socket.emit('appointment list 2', {
+      id: customer.id,
+      date: $('#appointment-detail-date').val()
+    });
+    select('loader');
+  }
+  socket.on('appointment list 2 success', function(res) {
+    transition({data: {src: 'appointment-detail', dir: 'forward', des: 'appointment-detail'}});
+    var times = $('#appointment-detail-times');
+    var dogs = $('#appointment-detail-dogs');
+    var options = $('#appointment-detail-options');
+    clear('appointment-detail-times');
+    clear('appointment-detail-dogs');
+    clear('appointment-detail-options');
+    for (var i = 0; i < res.times.length; i ++) {
+      times.append('<option>' + res.times[i] + '</option>');
+    }
+    for (var i = 0; i < res.dogs.length; i ++) {
+      dogs.append('<option>' + res.dogs[i].name + '</option>');
+    }
+    for (var i = 0; i < res.options.length; i ++) {
+      options.append('<option>' + res.options[i] + '</option>');
+    }
+  });
+
   /* Appointment Create */
   function appointmentCreate() {
     socket.emit('appointment create', {
+      date: $('#appointment-create-2-date').val(),
       time: $('#appointment-create-2-times').val(),
       id_customer: customer.id,
       dog: $('#appointment-create-2-dogs').val(),
@@ -552,7 +661,12 @@ $(document).ready(function() {
     select('loader');
   }
   socket.on('appointment delete success', function(res) {
-    transition({data: {src: 'appointment-detail', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
+    appointmentEdit();
+    if (customer.username === 'admin') {
+      transition({data: {src: 'appointment-detail', dir: 'backward', des: 'admin-dashboard', fn: adminSummaryFetch}});
+    } else {
+      transition({data: {src: 'appointment-detail', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
+    }
   });
   socket.on('appointment delete failure', function(res) {
   });

@@ -24,6 +24,30 @@ var db      = mysql.createConnection({
   database : 'groomie',
   port     : 3306
 });
+/*
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'youremail@gmail.com',
+    pass: 'yourpassword'
+  }
+});
+var mailOptions = {
+  from: 'youremail@gmail.com',
+  to: 'myfriend@yahoo.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+  //html: '<h1>Welcome</h1><p>That was easy!</p>'
+};
+transporter.sendMail(mailOptions, function(error, info) {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email send: ' + info.response);
+  }
+});
+*/
 
 var groom_options = [
   'wash only',
@@ -58,6 +82,16 @@ io.on('connection', function(socket) {
     db.query(query, params, function(err, res) {
       if (err) throw err;
       socket.emit('register success', res);
+    });
+  });
+
+  socket.on('reset password', function(data) {
+    var password = 'password';
+    var query = 'UPDATE groomie.Customer SET password=? WHERE email=?;';
+    var params = [password, data.email];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('reset password success');
     });
   });
 
@@ -138,6 +172,20 @@ io.on('connection', function(socket) {
     });
   });
 
+  socket.on('admin summary fetch', function(data) {
+    var appointments = [];
+    var query = 'SELECT id FROM groomie.Appointment;';
+    db.query(query, function (err, res) {
+      if (err) throw err;
+      for (var i = 0; i < res.length; i ++) {
+        appointments.push(res[i]);
+      }
+      socket.emit('admin summary fetch success', {
+        appointments
+      });
+    });
+  });
+
   socket.on('dog create', function(data) {
     var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, ?);';
     var params = [data.name, data.breed, data.age, data.id_customer];
@@ -170,7 +218,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment fetch', function(data) {
-    var query = 'SELECT id, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
+    var query = 'SELECT id, DATE_FORMAT(date, "%Y-%m-%d") AS date, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -190,23 +238,46 @@ io.on('connection', function(socket) {
         ret.dogs.push(res[i]);
       }
       var query = 'SELECT time_start FROM groomie.Appointment WHERE date=?;';
-      var params = ['2018-05-05'];
+      var params = [data.date];
       db.query(query, params, function (err, res) {
         if (err) throw err;
         var scheduled = [];
         for (var i = 0; i < res.length; i ++) {
           scheduled.push(res[i].time_start);
         }
-        ret.times = generateAvailableTimes(scheduled);
-        console.log(ret.times);
+        ret.times = generateDurations(generateAvailableTimes(scheduled));
         socket.emit('appointment list success', ret);
+      });
+    });
+  });
+  socket.on('appointment list 2', function(data) {
+    var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
+    var params = [data.id];
+    var ret = {};
+    ret.options = groom_options;
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      ret.dogs = [];
+      for (var i = 0; i < res.length; i ++) {
+        ret.dogs.push(res[i]);
+      }
+      var query = 'SELECT time_start FROM groomie.Appointment WHERE date=?;';
+      var params = [data.date];
+      db.query(query, params, function (err, res) {
+        if (err) throw err;
+        var scheduled = [];
+        for (var i = 0; i < res.length; i ++) {
+          scheduled.push(res[i].time_start);
+        }
+        ret.times = generateDurations(generateAvailableTimes(scheduled));
+        socket.emit('appointment list 2 success', ret);
       });
     });
   });
 
   socket.on('appointment create', function(data) {
-    var query = 'INSERT INTO groomie.Appointment (time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
-    var params = [data.time.split('-')[0], data.time.split('-')[1], data.id_customer, 1, data.dog, data.option, data.address, data.instructions];
+    var query = 'INSERT INTO groomie.Appointment (date, time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
+    var params = [data.date, data.time.split('-')[0], data.time.split('-')[1], data.id_customer, 1, data.dog, data.option, data.address, data.instructions];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('appointment create success', res);
@@ -236,6 +307,42 @@ io.on('connection', function(socket) {
   });
 
 });
+
+function generateDurations(time_starts) {
+  var times = {
+    0:'09:00:00',
+    1:'09:30:00',
+    2:'10:00:00',
+    3:'10:30:00',
+    4:'11:00:00',
+    5:'11:30:00',
+    6:'12:00:00',
+    7:'12:30:00',
+    8:'13:00:00',
+    9:'13:30:00',
+    10:'14:00:00',
+    11:'14:30:00',
+    12:'15:00:00',
+    13:'15:30:00',
+    14:'16:00:00',
+    15:'16:30:00',
+    16:'17:00:00'
+  }
+  var keys = Object.keys(times);
+  var key_end;
+  var time_end;
+  var time_all = [];
+  for (var i = 0; i < time_starts.length; i ++) {
+    for (let key of keys) {
+      if (times[key] === time_starts[i]) {
+        key_end = parseInt(key) + 3;
+        time_end = times[key_end];
+        time_all.push(time_starts[i] + '-' + time_end);
+      }
+    }
+  }
+  return time_all;
+}
 
 function generateAvailableTimes(time_starts) {
   console.log(time_starts);
