@@ -31,6 +31,11 @@
 ### Node.js Server
 #### cd into src/server directory
 #### npm install
+#### npm install express
+#### npm install socket.io
+#### npm install mysql
+#### npm install nodemailer
+#### npm install node-schedule
 #### node server.js
 
 ### Web Client

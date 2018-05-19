@@ -364,8 +364,8 @@ function sendEmail() {
   var mailOptions = {
     from: 'groomie.orange@gmail.com',
     to: 'ruifengl@student.unimelb.edu.au',
-    subject: 'Edison',
-    text: 'Hi my name is Wuang Shen.'
+    subject: 'Groomie Appointment Reminder',
+    text: 'Dear Groomie Customer, your appointment is scheduled to commence in 24 hours. Thank you. Kind Regards, Tom'
     //html: '<h1>Welcome</h1><p>That was easy!</p>'
   };
   transporter.sendMail(mailOptions, function(error, info) {
@@ -414,7 +414,6 @@ function generateDurations(time_starts) {
 }
 
 function generateAvailableTimes(time_starts) {
-  console.log(time_starts);
   var times = ['09:00:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00'];
   for (var i = 0; i < time_starts.length; i ++) {
     var negates = generateNegatingTimes(time_starts[i]);
@@ -433,7 +432,6 @@ function generateAvailableTimes(time_starts) {
 }
 
 function generateNegatingTimes(time_start) {
-  console.log(time_start);
   var times = {
     0:'09:00:00',
     1:'09:30:00',
