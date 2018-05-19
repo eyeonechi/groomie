@@ -174,14 +174,23 @@ io.on('connection', function(socket) {
 
   socket.on('admin summary fetch', function(data) {
     var appointments = [];
+    var feedback = [];
     var query = 'SELECT id FROM groomie.Appointment;';
     db.query(query, function (err, res) {
       if (err) throw err;
       for (var i = 0; i < res.length; i ++) {
         appointments.push(res[i]);
       }
-      socket.emit('admin summary fetch success', {
-        appointments
+      var query = 'SELECT id FROM groomie.Feedback;';
+      db.query(query, function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i ++) {
+          feedback.push(res[i]);
+        }
+        socket.emit('admin summary fetch success', {
+          appointments,
+          feedback
+        });
       });
     });
   });
@@ -293,6 +302,20 @@ io.on('connection', function(socket) {
     });
   });
 
+  socket.on('feedback submit', function(data) {
+    var query = 'INSERT INTO groomie.Feedback (creator, title, content, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP());';
+    var params = [data.id, data.title, data.content];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('feedback submit success', res);
+    });
+  });
+/*
+  socket.on('feedback fetch', function(data) {
+    var query = 'SELECT '
+    var params = [data.id];
+  });
+*/
   socket.on('disconnect', function() {
     console.log('connection terminated');
   });

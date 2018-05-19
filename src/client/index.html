@@ -107,6 +107,7 @@
             <button id='dashboard-button-create'>+appointment</button>
             <button id='dashboard-button-create-dog'>+dog</button>
             <button id='dashboard-button-profile'>profile</button>
+            <button id='dashboard-button-feedback'>feedback</button>
           </div>
         </div>
       </div>
@@ -116,7 +117,9 @@
         <div class='canvas'>
           <div class='content-detail'>
             <p>all appointments</p><br>
-            <ul id='admin-dashboard-appointments'></ul>
+            <ul id='admin-dashboard-appointments'></ul><br><br>
+            <p>all feedback</p><br>
+            <ul id='admin-dashboard-feedback'></ul>
           </div>
           <div class='content-control'>
             <button id='admin-dashboard-button-logout'>logout</button>
@@ -273,6 +276,22 @@
             <button id='dog-detail-button-save' class='edit' style='display: none;'>save</button>
             <button id='dog-detail-button-delete' class='edit' style='display: none;'>delete</button>
             <button id='dog-detail-button-back' class='edit-hide'>back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Fragment -->
+      <div id='feedback' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>title</p>
+            <input id='feedback-title' type='text'/>
+            <p>comment</p>
+            <textarea id='feedback-content' rows='12'></textarea>
+          </div>
+          <div class='content-control'>
+            <button id='feedback-button-back'>back</button>
+            <button id='feedback-button-submit'>submit</button>
           </div>
         </div>
       </div>

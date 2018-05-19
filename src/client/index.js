@@ -39,6 +39,12 @@ class Customer {
         this.appointments.push(new Appointment(appointment));
       }
     }
+    if (obj.feedback) {
+      this.feedback = new Array();
+      for (let fb of obj.feedback) {
+        this.feedback.push(new Appointment(fb));
+      }
+    }
     if (obj.dogs) {
       this.dogs = new Array();
       for (let dog of obj.dogs) {
@@ -149,6 +155,7 @@ $(document).ready(function() {
   $('#dashboard-button-create').click({src: 'dashboard', dir: 'forward', des: 'appointment-create', fn: appointmentList}, transition);
   $('#dashboard-button-create-dog').click({src: 'dashboard', dir: 'forward', des: 'dog-create'}, transition);
   $('#dashboard-button-profile').click({src: 'dashboard', dir: 'forward', des: 'profile', fn: profileFetch}, transition);
+  $('#dashboard-button-feedback').click({src: 'dashboard', dir: 'forward', des: 'feedback'}, transition);
 
   /* Admin Dashboard */
   $('#admin-dashboard-button-profile').click({src: 'admin-dashboard', dir: 'forward', des: 'profile-detail', fn: profileFetch}, transition);
@@ -184,6 +191,10 @@ $(document).ready(function() {
   $('#dog-detail-button-save').click({src: 'dog-detail', dir: 'forward', des: 'dog-detail', fn: dogUpdate}, transition);
   $('#dog-detail-button-delete').click({src: 'dog-detail', dir: 'backward', des: 'dashboard', fn: dogDelete}, transition);
   $('#dog-detail-button-back').click({src: 'dog-detail', dir: 'backward', des: 'dashboard'}, transition);
+
+  /* Feedback */
+  $('#feedback-button-submit').click({src: 'feedback', dir: 'backward', des: 'dashboard', fn: feedbackSubmit}, transition);
+  $('#feedback-button-back').click({src: 'feedback', dir: 'backward', des: 'dashboard'}, transition);
 
   /* About */
   $('#about-button-back').click({src: 'about', dir: 'backward', des: 'home'}, transition);
@@ -262,7 +273,7 @@ $(document).ready(function() {
   socket.on('admin summary fetch success', function(res) {
     transition({data: {src: 'home', dir: 'forward', des: 'admin-dashboard'}});
     clear('admin-dashboard-appointments');
-    console.log(res);
+    clear('admin-dashboard-feedback');
     customer.update(res);
     var appointments = $('#admin-dashboard-appointments');
     for (var i = 0; i < res.appointments.length; i ++) {
@@ -277,6 +288,21 @@ $(document).ready(function() {
         }
       }
       appointmentFetch();
+    });
+
+    var feedback = $('#admin-dashboard-feedback');
+    for (var i = 0; i < res.feedback.length; i ++) {
+      feedback.append('<li>' + res.feedback[i].id + '</li>');
+    }
+    feedback.on('click', 'li', function() {
+      for (let fb of customer.feedback) {
+        if (fb.id === parseInt($(this).html())) {
+          fb.selected = true;
+        } else {
+          fb.selected = false;
+        }
+      }
+      feedbackFetch();
     });
   });
 
@@ -689,6 +715,41 @@ $(document).ready(function() {
     transition({data: {src: 'appointment-detail', dir: 'forward', des: 'appointment-detail', fn: appointmentFetch}});
   });
   socket.on('appointment update failure', function(res) {
+  });
+
+  /* Feedback Fetch */
+  function feedbackFetch() {
+    for (let fb of customer.feedback) {
+      if (fb.selected) {
+        socket.emit('feedback fetch', {
+          id: fb.id
+        });
+        break;
+      }
+    }
+    select('loader');
+  }
+  socket.on('feedback fetch success', function(res) {
+    console.log('hello world');
+    /////////////////////////////
+  });
+  socket.on('feedback fetch failure', function(res) {
+  });
+
+  /* Feedback Submit */
+  function feedbackSubmit() {
+    socket.emit('feedback submit', {
+      creator: customer.id,
+      title: $('#feedback-title').val(),
+      content: $('#feedback-content').val(),
+      created: new Date()
+    });
+    select('loader');
+  }
+  socket.on('feedback submit success', function(res) {
+    transition({data: {src: 'feedback', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
+  });
+  socket.on('feedback submit failure', function(res) {
   });
 
   function transition(e) {
