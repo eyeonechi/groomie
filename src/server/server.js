@@ -24,30 +24,9 @@ var db      = mysql.createConnection({
   database : 'groomie',
   port     : 3306
 });
-/*
+
 var nodemailer = require('nodemailer');
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'youremail@gmail.com',
-    pass: 'yourpassword'
-  }
-});
-var mailOptions = {
-  from: 'youremail@gmail.com',
-  to: 'myfriend@yahoo.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-  //html: '<h1>Welcome</h1><p>That was easy!</p>'
-};
-transporter.sendMail(mailOptions, function(error, info) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email send: ' + info.response);
-  }
-});
-*/
+var schedule = require('node-schedule');
 
 var groom_options = [
   'wash only',
@@ -70,6 +49,27 @@ db.connect(function(err) {
     console.log('failed to connect to database');
   } else {
     console.log('database connected');
+  }
+});
+
+// Schedules email notification
+var query = 'SELECT DATE_FORMAT(date, "%Y-%m-%d") AS date, time_start FROM groomie.Appointment;';
+db.query(query, function(err, res) {
+  if (err) throw err;
+  var year, month, day, hour, min, sec;
+  var date;
+  for (var i = 0; i < res.length; i ++) {
+    year = res[i].date.split('-')[0];
+    month = res[i].date.split('-')[1] - 1;
+    day = res[i].date.split('-')[2] - 1;
+    hour = res[i].time_start.split(':')[0];
+    min = res[i].time_start.split(':')[1];
+    sec = res[i].time_start.split(':')[2];
+    date = new Date(year, month, day, hour, min, sec);
+    console.log('Email notification scheduled on: ' + date);
+    var j = schedule.scheduleJob(date, function(){
+      sendEmail();
+    });
   }
 });
 
@@ -302,20 +302,42 @@ io.on('connection', function(socket) {
     });
   });
 
+  socket.on('change password', function(data) {
+    var query = 'SELECT password FROM groomie.Customer WHERE id=?;';
+    var params = [data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      if (res[0].password === data.curr_password) {
+        var query = 'UPDATE groomie.Customer SET password=? WHERE id=?;';
+        var params = [data.new_password, data.id];
+        db.query(query, params, function (err, res) {
+          if (err) throw err;
+          socket.emit('change password success', {});
+        });
+      } else {
+        socket.emit('change password failure', {});
+      }
+    });
+  });
+
   socket.on('feedback submit', function(data) {
     var query = 'INSERT INTO groomie.Feedback (creator, title, content, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP());';
-    var params = [data.id, data.title, data.content];
+    var params = [data.creator, data.title, data.content];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       socket.emit('feedback submit success', res);
     });
   });
-/*
+
   socket.on('feedback fetch', function(data) {
-    var query = 'SELECT '
+    var query = 'SELECT creator, title, content, DATE_FORMAT(created, "%Y-%m-%d") AS created FROM groomie.Feedback WHERE id=?;';
     var params = [data.id];
+    db.query(query, params, function (err, res) {
+      if (err) throw err;
+      socket.emit('feedback fetch success', res[0]);
+    });
   });
-*/
+
   socket.on('disconnect', function() {
     console.log('connection terminated');
   });
@@ -330,6 +352,30 @@ io.on('connection', function(socket) {
   });
 
 });
+
+function sendEmail() {
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'groomie.orange@gmail.com',
+      pass: 'teamorange'
+    }
+  });
+  var mailOptions = {
+    from: 'groomie.orange@gmail.com',
+    to: 'ruifengl@student.unimelb.edu.au',
+    subject: 'Edison',
+    text: 'Hi my name is Wuang Shen.'
+    //html: '<h1>Welcome</h1><p>That was easy!</p>'
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email send: ' + info.response);
+    }
+  });
+}
 
 function generateDurations(time_starts) {
   var times = {

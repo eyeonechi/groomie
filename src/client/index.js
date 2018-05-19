@@ -42,7 +42,7 @@ class Customer {
     if (obj.feedback) {
       this.feedback = new Array();
       for (let fb of obj.feedback) {
-        this.feedback.push(new Appointment(fb));
+        this.feedback.push(new Feedback(fb));
       }
     }
     if (obj.dogs) {
@@ -60,6 +60,12 @@ class Customer {
       this.appointments = new Array();
       for (let appointment of obj.appointments) {
         this.appointments.push(new Appointment(appointment));
+      }
+    }
+    if (obj.feedback) {
+      this.feedback = new Array();
+      for (let fb of obj.feedback) {
+        this.feedback.push(new Feedback(fb));
       }
     }
     if (obj.dogs) {
@@ -121,6 +127,23 @@ class Appointment {
   }
 }
 
+class Feedback {
+  constructor(obj) {
+    if (obj.id) this.id = obj.id;
+    if (obj.title) this.title = obj.title;
+    if (obj.content) this.content = obj.content;
+    if (obj.creator) this.creator = obj.creator;
+    if (obj.created) this.created = obj.created;
+  }
+  update(obj) {
+    if (obj.id) this.id = obj.id;
+    if (obj.title) this.title = obj.title;
+    if (obj.content) this.content = obj.content;
+    if (obj.creator) this.creator = obj.creator;
+    if (obj.created) this.created = obj.created;
+  }
+}
+
 'use strict';
 
 $(document).ready(function() {
@@ -164,7 +187,12 @@ $(document).ready(function() {
   /* Profile Detail */
   $('#profile-detail-button-edit').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileEdit}, transition);
   $('#profile-detail-button-save').click({src: 'profile-detail', dir: 'forward', des: 'profile-detail', fn: profileUpdate}, transition);
+  $('#profile-detail-button-password').click({src: 'profile-detail', dir: 'forward', des: 'change-password'}, transition);
   $('#profile-detail-button-back').click({src: 'profile-detail', dir: 'backward', des: 'dashboard', fn: profileDetailBack}, transition);
+
+  /* Change Password */
+  $('#change-password-button-submit').click({src: 'change-password', dir: 'backward', des: 'dashboard', fn: changePassword}, transition);
+  $('#change-password-button-back').click({src: 'change-password', dir: 'backward', des: 'profile-detail'}, transition);
 
   /* Appointment Create */
   $('#appointment-create-button-back').click({src: 'appointment-create', dir: 'backward', des: 'dashboard'}, transition);
@@ -195,6 +223,9 @@ $(document).ready(function() {
   /* Feedback */
   $('#feedback-button-submit').click({src: 'feedback', dir: 'backward', des: 'dashboard', fn: feedbackSubmit}, transition);
   $('#feedback-button-back').click({src: 'feedback', dir: 'backward', des: 'dashboard'}, transition);
+
+  /* Feedback Detail */
+  $('#feedback-detail-button-back').click({src: 'feedback-detail', dir: 'backward', des: 'admin-dashboard', fn: feedbackDetailBack}, transition);
 
   /* About */
   $('#about-button-back').click({src: 'about', dir: 'backward', des: 'home'}, transition);
@@ -395,6 +426,11 @@ $(document).ready(function() {
     } else {
       transition({data: {src: 'profile-detail', dir: 'backward', des: 'dashboard'}});
     }
+  }
+
+  /* Feedback Detail Back */
+  function feedbackDetailBack() {
+    transition({data: {src: 'feedback-detail', dir: 'backward', des: 'admin-dashboard'}});
   }
 
   /* Dog Fetch */
@@ -717,6 +753,26 @@ $(document).ready(function() {
   socket.on('appointment update failure', function(res) {
   });
 
+  /* Change Password */
+  function changePassword() {
+    if ($('#change-password-new').val() === $('#change-password-confirm').val()) {
+      socket.emit('change password', {
+        id: customer.id,
+        curr_password: $('#change-password-current').val(),
+        new_password: $('#change-password-new').val()
+      });
+      select('loader');
+    }
+  }
+  socket.on('change password success', function(res) {
+    snackbar('password change success');
+    transition({data: {src: 'change-password', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
+  });
+  socket.on('change password failure', function(res) {
+    snackbar('password change failure');
+    transition({data: {src: 'change-password', dir: 'backward', des: 'dashboard', fn: summaryFetch}});
+  });
+
   /* Feedback Fetch */
   function feedbackFetch() {
     for (let fb of customer.feedback) {
@@ -730,8 +786,11 @@ $(document).ready(function() {
     select('loader');
   }
   socket.on('feedback fetch success', function(res) {
-    console.log('hello world');
-    /////////////////////////////
+    transition({data: {src: 'dashboard', dir: 'forward', des: 'feedback-detail'}});
+    $('#feedback-detail-title').val(res.title);
+    $('#feedback-detail-content').val(res.content);
+    $('#feedback-detail-creator').val(res.creator);
+    $('#feedback-detail-created').val(res.created);
   });
   socket.on('feedback fetch failure', function(res) {
   });

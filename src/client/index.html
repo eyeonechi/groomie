@@ -144,7 +144,26 @@
           <div class='content-control'>
             <button id='profile-detail-button-edit'>edit</button>
             <button id='profile-detail-button-save' class='edit' style='display: none;'>save</button>
+            <button id='profile-detail-button-password' class='edit-hide'>change pw</button>
             <button id='profile-detail-button-back' class='edit-hide'>back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password Fragment -->
+      <div id='change-password' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>current password</p>
+            <input id='change-password-current' type='password'/><br>
+            <p>new password</p>
+            <input id='change-password-new' type='password'/><br>
+            <p>confirm password</p>
+            <input id='change-password-confirm' type='password'/><br>
+          </div>
+          <div class='content-control'>
+            <button id='change-password-button-submit'>submit</button>
+            <button id='change-password-button-back'>back</button>
           </div>
         </div>
       </div>
@@ -292,6 +311,25 @@
           <div class='content-control'>
             <button id='feedback-button-back'>back</button>
             <button id='feedback-button-submit'>submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Detail Fragment -->
+      <div id='feedback-detail' class='content'>
+        <div class='canvas'>
+          <div class='content-detail'>
+            <p>title</p>
+            <input id='feedback-detail-title' class='edit-input' readonly='readonly' type='text'/>
+            <p>comment</p>
+            <textarea id='feedback-detail-content' class='edit-input' readonly='readonly' rows='12'></textarea>
+            <p>creator</p>
+            <input id='feedback-detail-creator' class='edit-input' readonly='readonly' type='text'/>
+            <p>created</p>
+            <input id='feedback-detail-created' class='edit-input' readonly='readonly' type='text'/>
+          </div>
+          <div class='content-control'>
+            <button id='feedback-detail-button-back'>back</button>
           </div>
         </div>
       </div>
