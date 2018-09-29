@@ -8,7 +8,7 @@
 
 'use strict';
 
-var HOST    = 'localhost';
+var HOST    = 'localhost';//'192.168.1.101';
 var PORT    = 3000;
 
 var express = require('express');
@@ -16,6 +16,8 @@ var app     = express();
 var http    = require('http');
 var server  = http.createServer(app);
 var io      = require('socket.io').listen(server);
+var os      = require('os');
+var ifaces  = os.networkInterfaces();
 var mysql   = require('mysql');
 var db      = mysql.createConnection({
   host     : 'localhost',
@@ -33,6 +35,25 @@ var groom_options = [
   'wash and nail clipping',
   'deluxe grooming'
 ];
+
+Object.keys(ifaces).forEach(function(ifname) {
+  var alias = 0;
+  ifaces[ifname].forEach(function(iface) {
+    if ('IPv4' !== iface.family || iface.internal !== false) {
+      // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
+      return;
+    }
+    if (alias >= 1) {
+      // This single interface has multiple IPv4 addresses
+      console.log(ifname + ':' + alias, iface.address);
+    } else {
+      // This interface has only one IPv4 address
+      console.log(ifname, iface.address);
+      HOST = iface.address;
+    }
+    ++alias;
+  });
+});
 
 // Listen on specified port
 server.listen(PORT, HOST, function() {
