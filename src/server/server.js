@@ -8,7 +8,7 @@
 
 'use strict';
 
-var HOST    = 'localhost';//'192.168.1.101';
+var HOST    = 'localhost'; //'192.168.1.101';
 var PORT    = 3000;
 
 var express = require('express');
@@ -20,10 +20,10 @@ var os      = require('os');
 var ifaces  = os.networkInterfaces();
 var mysql   = require('mysql');
 var db      = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'password',
-  database : 'groomie',
+  host     : 'fojvtycq53b2f2kx.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
+  user     : 'n9hgjob40p0o9sn7',
+  password : 'm7krhsro1t2j4n66',
+  database : 'y95ztl00tr4mkj78',
   port     : 3306
 });
 
@@ -56,9 +56,13 @@ Object.keys(ifaces).forEach(function(ifname) {
 });
 
 // Listen on specified port
-server.listen(PORT, HOST, function() {
+// server.listen(PORT, HOST, function() {
+//   console.log(Date());
+//   console.log('server running at http://' + HOST + ':' + PORT + '/');
+// });
+server.listen(process.env.PORT || PORT, function() {
   console.log(Date());
-  console.log('server running at http://' + HOST + ':' + PORT + '/');
+  console.log('Server running on Heroku');
 });
 
 // Route handler to serve client
@@ -74,7 +78,7 @@ db.connect(function(err) {
 });
 
 // Schedules email notification
-var query = 'SELECT DATE_FORMAT(date, "%Y-%m-%d") AS date, time_start FROM groomie.Appointment;';
+var query = 'SELECT DATE_FORMAT(date, "%Y-%m-%d") AS date, time_start FROM y95ztl00tr4mkj78.Appointment;';
 db.query(query, function(err, res) {
   if (err) throw err;
   var year, month, day, hour, min, sec;
@@ -98,7 +102,7 @@ io.on('connection', function(socket) {
   console.log('connection established');
 
   socket.on('register', function(data) {
-    var query = 'INSERT INTO groomie.Customer (username, password) VALUES (?, ?);';
+    var query = 'INSERT INTO y95ztl00tr4mkj78.Customer (username, password) VALUES (?, ?);';
     var params = [data.username, data.password];
     db.query(query, params, function(err, res) {
       if (err) throw err;
@@ -108,7 +112,7 @@ io.on('connection', function(socket) {
 
   socket.on('reset password', function(data) {
     var password = 'password';
-    var query = 'UPDATE groomie.Customer SET password=? WHERE email=?;';
+    var query = 'UPDATE y95ztl00tr4mkj78.Customer SET password=? WHERE email=?;';
     var params = [password, data.email];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -117,7 +121,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('login', function(data) {
-    var query = 'SELECT id, username, password, phone FROM groomie.Customer WHERE username=? AND password=?;';
+    var query = 'SELECT id, username, password, phone FROM y95ztl00tr4mkj78.Customer WHERE username=? AND password=?;';
     var params = [data.username, data.password];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -134,7 +138,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('profile fetch', function(data) {
-    var query = 'SELECT id, username, email, phone, address FROM groomie.Customer WHERE id=?;';
+    var query = 'SELECT id, username, email, phone, address FROM y95ztl00tr4mkj78.Customer WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -143,7 +147,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('profile update', function(data) {
-    var query = 'UPDATE groomie.Customer SET username=?, email=?, phone=?, address=? WHERE id=?;';
+    var query = 'UPDATE y95ztl00tr4mkj78.Customer SET username=?, email=?, phone=?, address=? WHERE id=?;';
     var params = [data.name, data.email, data.phone, data.address, data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -152,7 +156,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog update', function(data) {
-    var query = 'UPDATE groomie.Dog SET name=?, age=?, breed=? WHERE id=?;';
+    var query = 'UPDATE y95ztl00tr4mkj78.Dog SET name=?, age=?, breed=? WHERE id=?;';
     var params = [data.name, data.age, data.breed, data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -161,7 +165,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment update', function(data) {
-    var query = 'UPDATE groomie.Appointment SET instructions=? WHERE id=?;';
+    var query = 'UPDATE y95ztl00tr4mkj78.Appointment SET instructions=? WHERE id=?;';
     var params = [data.instructions, data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -172,14 +176,14 @@ io.on('connection', function(socket) {
   socket.on('summary fetch', function(data) {
     var appointments = [];
     var dogs = [];
-    var query = 'SELECT id FROM groomie.Appointment WHERE id_customer=(SELECT id FROM groomie.Customer WHERE id=?);';
+    var query = 'SELECT id FROM y95ztl00tr4mkj78.Appointment WHERE id_customer=(SELECT id FROM y95ztl00tr4mkj78.Customer WHERE id=?);';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       for (var i = 0; i < res.length; i ++) {
         appointments.push(res[i]);
       }
-      var query = 'SELECT id FROM groomie.Dog WHERE id_customer=(SELECT id FROM groomie.Customer WHERE id=?);';
+      var query = 'SELECT id FROM y95ztl00tr4mkj78.Dog WHERE id_customer=(SELECT id FROM y95ztl00tr4mkj78.Customer WHERE id=?);';
       db.query(query, params, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i ++) {
@@ -196,13 +200,13 @@ io.on('connection', function(socket) {
   socket.on('admin summary fetch', function(data) {
     var appointments = [];
     var feedback = [];
-    var query = 'SELECT id FROM groomie.Appointment;';
+    var query = 'SELECT id FROM y95ztl00tr4mkj78.Appointment;';
     db.query(query, function (err, res) {
       if (err) throw err;
       for (var i = 0; i < res.length; i ++) {
         appointments.push(res[i]);
       }
-      var query = 'SELECT id FROM groomie.Feedback;';
+      var query = 'SELECT id FROM y95ztl00tr4mkj78.Feedback;';
       db.query(query, function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i ++) {
@@ -217,7 +221,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog create', function(data) {
-    var query = 'INSERT INTO groomie.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, ?);';
+    var query = 'INSERT INTO y95ztl00tr4mkj78.Dog (name, breed, age, id_customer) VALUES (?, ?, ?, ?);';
     var params = [data.name, data.breed, data.age, data.id_customer];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -226,11 +230,11 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog delete', function(data) {
-    var query = 'DELETE FROM groomie.Appointment WHERE id_dog=?;';
+    var query = 'DELETE FROM y95ztl00tr4mkj78.Appointment WHERE id_dog=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
-      query = 'DELETE FROM groomie.Dog WHERE id=?;';
+      query = 'DELETE FROM y95ztl00tr4mkj78.Dog WHERE id=?;';
       db.query(query, params, function (err, res) {
         if (err) throw err;
         socket.emit('dog delete success', res[0]);
@@ -239,7 +243,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('dog fetch', function(data) {
-    var query = 'SELECT id, name, age, breed FROM groomie.Dog WHERE id=?;';
+    var query = 'SELECT id, name, age, breed FROM y95ztl00tr4mkj78.Dog WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -248,7 +252,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment fetch', function(data) {
-    var query = 'SELECT id, DATE_FORMAT(date, "%Y-%m-%d") AS date, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM groomie.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM groomie.Dog WHERE id=id_dog) as dog FROM groomie.Appointment WHERE id=?;';
+    var query = 'SELECT id, DATE_FORMAT(date, "%Y-%m-%d") AS date, location, time_start, time_end, CONVERT(instructions USING utf8) as instructions, groom_option, (SELECT name FROM y95ztl00tr4mkj78.Groomer WHERE id=id_groomer) as groomer, (SELECT name FROM y95ztl00tr4mkj78.Dog WHERE id=id_dog) as dog FROM y95ztl00tr4mkj78.Appointment WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -257,7 +261,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment list', function(data) {
-    var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
+    var query = 'SELECT name FROM y95ztl00tr4mkj78.Dog WHERE id_customer=?;';
     var params = [data.id];
     var ret = {};
     ret.options = groom_options;
@@ -267,7 +271,7 @@ io.on('connection', function(socket) {
       for (var i = 0; i < res.length; i ++) {
         ret.dogs.push(res[i]);
       }
-      var query = 'SELECT time_start FROM groomie.Appointment WHERE date=?;';
+      var query = 'SELECT time_start FROM y95ztl00tr4mkj78.Appointment WHERE date=?;';
       var params = [data.date];
       db.query(query, params, function (err, res) {
         if (err) throw err;
@@ -281,7 +285,7 @@ io.on('connection', function(socket) {
     });
   });
   socket.on('appointment list 2', function(data) {
-    var query = 'SELECT name FROM groomie.Dog WHERE id_customer=?;';
+    var query = 'SELECT name FROM y95ztl00tr4mkj78.Dog WHERE id_customer=?;';
     var params = [data.id];
     var ret = {};
     ret.options = groom_options;
@@ -291,7 +295,7 @@ io.on('connection', function(socket) {
       for (var i = 0; i < res.length; i ++) {
         ret.dogs.push(res[i]);
       }
-      var query = 'SELECT time_start FROM groomie.Appointment WHERE date=?;';
+      var query = 'SELECT time_start FROM y95ztl00tr4mkj78.Appointment WHERE date=?;';
       var params = [data.date];
       db.query(query, params, function (err, res) {
         if (err) throw err;
@@ -306,7 +310,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment create', function(data) {
-    var query = 'INSERT INTO groomie.Appointment (date, time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, ?, (SELECT id FROM groomie.Dog WHERE name=?), ?, ?, ?);';
+    var query = 'INSERT INTO y95ztl00tr4mkj78.Appointment (date, time_start, time_end, id_customer, id_groomer, id_dog, groom_option, location, instructions) VALUES (?, ?, ?, ?, ?, (SELECT id FROM y95ztl00tr4mkj78.Dog WHERE name=?), ?, ?, ?);';
     var params = [data.date, data.time.split('-')[0], data.time.split('-')[1], data.id_customer, 1, data.dog, data.option, data.address, data.instructions];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -315,7 +319,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('appointment delete', function(data) {
-    var query = 'DELETE FROM groomie.Appointment WHERE id=?;';
+    var query = 'DELETE FROM y95ztl00tr4mkj78.Appointment WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -324,12 +328,12 @@ io.on('connection', function(socket) {
   });
 
   socket.on('change password', function(data) {
-    var query = 'SELECT password FROM groomie.Customer WHERE id=?;';
+    var query = 'SELECT password FROM y95ztl00tr4mkj78.Customer WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
       if (res[0].password === data.curr_password) {
-        var query = 'UPDATE groomie.Customer SET password=? WHERE id=?;';
+        var query = 'UPDATE y95ztl00tr4mkj78.Customer SET password=? WHERE id=?;';
         var params = [data.new_password, data.id];
         db.query(query, params, function (err, res) {
           if (err) throw err;
@@ -342,7 +346,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('feedback submit', function(data) {
-    var query = 'INSERT INTO groomie.Feedback (creator, title, content, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP());';
+    var query = 'INSERT INTO y95ztl00tr4mkj78.Feedback (creator, title, content, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP());';
     var params = [data.creator, data.title, data.content];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -351,7 +355,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('feedback fetch', function(data) {
-    var query = 'SELECT creator, title, content, DATE_FORMAT(created, "%Y-%m-%d") AS created FROM groomie.Feedback WHERE id=?;';
+    var query = 'SELECT creator, title, content, DATE_FORMAT(created, "%Y-%m-%d") AS created FROM y95ztl00tr4mkj78.Feedback WHERE id=?;';
     var params = [data.id];
     db.query(query, params, function (err, res) {
       if (err) throw err;
@@ -378,12 +382,12 @@ function sendEmail() {
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'groomie.orange@gmail.com',
+      user: 'y95ztl00tr4mkj78.orange@gmail.com',
       pass: 'teamorange'
     }
   });
   var mailOptions = {
-    from: 'groomie.orange@gmail.com',
+    from: 'y95ztl00tr4mkj78.orange@gmail.com',
     to: 'ruifengl@student.unimelb.edu.au',
     subject: 'Groomie Appointment Reminder',
     text: 'Dear Groomie Customer, your appointment is scheduled to commence in 24 hours. Thank you. Kind Regards, Tom'
