@@ -14,8 +14,6 @@ jobs:
     - name: CI
       run: |
         yarn install
-        yarn test
-        yarn build
     - name: CD
       if: job.status == 'success'
       env:
