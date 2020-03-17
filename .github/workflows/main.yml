@@ -1,21 +1,23 @@
 name: Main
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Login to Heroku Container registry
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:login
-    - name: Build and Push
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      run: heroku container:push -a $HEROKU_APP_NAME web
-    - name: Release
+    - name: CI
+      uses: actions/setup-node@v1.1.0
+    - run: yarn install
+    - run: yarn test
+    - run: yarn build
+    - name: CD
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      run: heroku container:release -a $HEROKU_APP_NAME web
+      if: job.status == 'success'
+    - run: git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+    - run: git push heroku HEAD:master -f
