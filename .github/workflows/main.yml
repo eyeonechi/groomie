@@ -9,15 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: CI
+    - name: Setup
       uses: actions/setup-node@v1.1.0
-    - run: yarn install
-    - run: yarn test
-    - run: yarn build
+    - name: CI
+    - run: |
+        yarn install
+        yarn test
+        yarn build
     - name: CD
+      if: job.status == 'success'
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      if: job.status == 'success'
-    - run: git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-    - run: git push heroku HEAD:master -f
+      run: |
+        git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git
+        git push heroku HEAD:master -f
